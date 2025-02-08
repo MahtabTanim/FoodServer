@@ -27,3 +27,7 @@ class UserForm(forms.ModelForm):
             raise forms.ValidationError(
                 "Password Does not Match",
             )
+        if len(password) < 8:
+            raise forms.ValidationError(
+                "Password Must have 8 or more characters",
+            )

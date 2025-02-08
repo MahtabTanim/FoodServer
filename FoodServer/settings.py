@@ -128,3 +128,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # custome User Model
 AUTH_USER_MODEL = "account.User"
+
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+}

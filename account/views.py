@@ -4,6 +4,7 @@ from django.utils.html import format_html
 
 from account.models import User
 from .forms import UserForm
+from django.contrib import messages
 
 # Create your views here.
 
@@ -36,12 +37,14 @@ def registerUser(request):
             )
             user.role = 2
             user.save()
+            messages.success(request, "Your Account has been registered Successfully")
             return redirect("registerUser")
         else:
             print("form invalid")
-            print(form.errors)
+            messages.error(request, "Invalid Form Submission")
     else:
         form = UserForm()
+
     context = {
         "form": form,
     }
