@@ -174,3 +174,7 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/django
+.DS_Store
+.DS_Store
+FoodServer/static/.DS_Store
+FoodServer/static/.DS_Store
