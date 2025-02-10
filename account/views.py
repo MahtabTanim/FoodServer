@@ -5,13 +5,18 @@ from django.utils.html import format_html
 from account.models import User, UserProfile
 from vendor.models import Vendor
 from .forms import UserForm, VendorForm
-from django.contrib import messages
+from django.contrib import messages, auth
+from .utils import detectUser
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 
 def registerUser(request):
-    if request.method == "POST":
+    if request.user.is_authenticated:
+        messages.warning(request, "you are already logged in")
+        return redirect("myAccount")
+    elif request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
             # create user using form
@@ -53,7 +58,10 @@ def registerUser(request):
 
 
 def registerVendor(request):
-    if request.method == "POST":
+    if request.user.is_authenticated:
+        messages.warning(request, "you are already logged in")
+        return redirect("myAccount")
+    elif request.method == "POST":
         form = UserForm(request.POST)
         v_form = VendorForm(request.POST, request.FILES)
         if form.is_valid() and v_form.is_valid():
@@ -86,13 +94,10 @@ def registerVendor(request):
             vendor.save()
             messages.success(
                 request,
-                "Your Vendor Account has been registered Successfully , Please wait for the Approva",
+                "Your Vendor Account has been registered Successfully , Please wait for the Approval",
             )
             return redirect("registerVendor")
         else:
-            print(request.POST)
-            print(form.errors)
-            print(v_form.errors)
             messages.error(request, "Invalid Vendor Form Submission")
 
     else:
@@ -104,3 +109,45 @@ def registerVendor(request):
         "v_form": v_form,
     }
     return render(request, "account/registerVendor.html", context=context)
+
+
+def login(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "you are already logged in")
+        return redirect("myAccount")
+    elif request.method == "POST":
+        print(request.POST)
+        email = request.POST["email"]
+        password = request.POST["password"]
+        user = auth.authenticate(email=email, password=password)
+        if user:
+            auth.login(request, user)
+            messages.success(request, "You are now logged in")
+            return redirect("myAccount")
+        else:
+            messages.error(request, "Invalid Login Credential")
+            return redirect("login")
+    return render(request, "account/login.html")
+
+
+def logout(request):
+    auth.logout(request)
+    messages.info(request, "You are Now Logged Out")
+    return redirect("login")
+
+
+@login_required(login_url="login")
+def myAccount(request):
+    user = request.user
+    redirectUrl = detectUser(user)
+    return redirect(redirectUrl)
+
+
+@login_required(login_url="login")
+def custDashboard(request):
+    return render(request, "account/custDashboard.html")
+
+
+@login_required(login_url="login")
+def restaurantDashboard(request):
+    return render(request, "account/restaurantDashboard.html")
