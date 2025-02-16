@@ -6,7 +6,7 @@ from account.models import User, UserProfile
 from vendor.models import Vendor
 from .forms import UserForm, VendorForm
 from django.contrib import messages, auth
-from .utils import detectUser
+from .utils import detectUser, send_verification_email
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 
@@ -34,16 +34,6 @@ def registerUser(request):
     elif request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
-            # create user using form
-            # password = form.cleaned_data["password"]
-            # user = form.save(commit=False)
-            # user.role = 2
-            # user.set_password(password)
-            # user.save()
-            # return redirect("registerUser")
-
-            # create user using User model
-
             first_name = form.cleaned_data["first_name"]
             last_name = form.cleaned_data["last_name"]
             username = form.cleaned_data["username"]
@@ -58,8 +48,11 @@ def registerUser(request):
             )
             user.role = 2
             user.save()
+
+            # send Verification Email
+            send_verification_email(request, user)
             messages.success(request, "Your Account has been registered Successfully")
-            return redirect("registerUser")
+            return redirect("login")
         else:
             print("form invalid")
             messages.error(request, "Invalid Form Submission")
@@ -107,6 +100,7 @@ def registerVendor(request):
                 vendor_licesnse=vendor_licesnse,
             )
             vendor.save()
+            send_verification_email(request, user)
             messages.success(
                 request,
                 "Your Vendor Account has been registered Successfully , Please wait for the Approval",
@@ -168,3 +162,8 @@ def custDashboard(request):
 @user_passes_test(check_restaurant)
 def restaurantDashboard(request):
     return render(request, "account/restaurantDashboard.html")
+
+
+def activate(request, uidb64, token):
+    # activate the user by setting the is_active property to true
+    pass
