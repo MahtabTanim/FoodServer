@@ -7,9 +7,24 @@ from vendor.models import Vendor
 from .forms import UserForm, VendorForm
 from django.contrib import messages, auth
 from .utils import detectUser
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 
-# Create your views here.
+
+# Restrict Restaurant from accessing Customer Page
+def check_restaurant(user):
+    if user.role == 1:
+        return True
+    else:
+        raise PermissionDenied
+
+
+# Restrict Customer from Accessing vendor
+def check_customer(user):
+    if user.role == 2:
+        return True
+    else:
+        raise PermissionDenied
 
 
 def registerUser(request):
@@ -144,10 +159,12 @@ def myAccount(request):
 
 
 @login_required(login_url="login")
+@user_passes_test(check_customer)
 def custDashboard(request):
     return render(request, "account/custDashboard.html")
 
 
 @login_required(login_url="login")
+@user_passes_test(check_restaurant)
 def restaurantDashboard(request):
     return render(request, "account/restaurantDashboard.html")
