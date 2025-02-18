@@ -1,0 +1,8 @@
+{% autoescape off %}
+  Hi {{ user.first_name }}
+  {% if is_approved %}
+    Your Restaturant has been approved to serve in Food Server . Please Visit dashboard for more updates.
+  {% else %}
+    We are sorry to announce that your restaurant has been rejected to server in Food Server . Sorry for the inconvinenve.Hope You good luck.
+  {% endif %}
+{% endautoescape %}

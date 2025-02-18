@@ -1,4 +1,9 @@
 from django.urls import path
 from . import views
 
-urlpatterns = []
+from account.views import restaurantDashboard
+
+urlpatterns = [
+    path("", restaurantDashboard, name="vendor"),
+    path("profile/", views.vprofile, name="vprofile"),
+]
