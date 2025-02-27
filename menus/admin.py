@@ -13,6 +13,7 @@ class CategoryManager(ModelAdmin):
     prepopulated_fields = {"slug": ("category_name",)}
     list_display_links = [
         "vendor",
+        "category_name",
     ]
     search_fields = ["category_name", "vendor__vendor_name"]
     list_filter = ["category_name", "vendor__vendor_name"]
@@ -21,7 +22,11 @@ class CategoryManager(ModelAdmin):
 class FoodItemAdmin(ModelAdmin):
     prepopulated_fields = {"slug": ("food_title",)}
     list_display = ["food_title", "category", "vendor", "price", "is_available"]
-    list_display_links = ["category", "vendor"]
+    list_display_links = [
+        "category",
+        "vendor",
+        "food_title",
+    ]
     list_editable = ["is_available", "price"]
     search_fields = [
         "food_title",
