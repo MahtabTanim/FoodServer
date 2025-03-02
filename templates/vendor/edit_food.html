@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  {% include 'includes/alerts.html' %}
+  <!-- Main Section Start -->
+  <div class="main-section">
+    {% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+            <!-- Load Sidebar -->
+            {% include 'includes/res_sidebar.html' %}
+          </div>
+          <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="user-dashboard loader-holder">
+              <div class="user-holder">
+                <h5 class="text-uppercase">Edit Food</h5>
+                <hr />
+                <button class="btn btn-secondary btn-sm active" onclick="history.back()"><i class="fa fa-angle-left" aria-hidden="true"></i> Back</button>
+                <br /> <br />
+                <!-- Form Start -->
+                <form action="{% url 'edit_food' food.id %}" method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="form-fields-set">
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="field-holder">
+                          <label for="">Food Title *</label>
+                          {{ foodItemForm.food_title }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="field-holder">
+                          <label for="">Category Name *</label>
+                          {{ foodItemForm.category }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="field-holder">
+                          <label for="">Price</label>
+                          {{ foodItemForm.price }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="restaurant-info">
+                        <div class="img-holder">
+                          <ul class="foodbakery-gallery-holder">
+                            <li class="gal-img">
+                              <div class="drag-list">
+                                <div class="item-thumb">
+                                  <img class="thumbnail" src="{{ food.image.url }}" alt="" width="30" />
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="text-holder">
+                          <label>Update Food Image</label>
+                          <div class="upload-gallery">{{ foodItemForm.image }}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="field-holder">
+                          <label for="">Description</label>
+                          {{ foodItemForm.description }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-6 col-md-6 col-sm-12">
+                        <div class="field-holder">
+                          <label for="">Is Available</label>
+                          {{ foodItemForm.is_available }}
+                        </div>
+                      </div>
+                    </div>
+                    <button type="submit" class="btn = btn-info"><i class="fa fa-ok" aria-hidden="true">&nbsp;Update</i></button>
+                    <span style="margin-left: 20px"></span>
+                    <a href="{% url 'delete_food' food.id %}" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Food Item?')"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                  </div>
+                </form>
+                <!-- form End -->
+                <!-- Errors -->
+                <br /><ul class="list-group">
+                  {% for field in categoryForm %}
+                    {% if field.errors %}
+                      {% for error in field.errors %}
+                        <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                      {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+                <hr />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main Section End -->
+{% endblock %}

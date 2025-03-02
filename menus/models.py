@@ -20,7 +20,7 @@ class Category(models.Model):
         return self.category_name
 
     def clean(self):
-        self.category_name = self.category_name.lower()
+        self.category_name = self.category_name.capitalize()
 
 
 class FoodItem(models.Model):
