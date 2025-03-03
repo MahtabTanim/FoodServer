@@ -31,6 +31,11 @@ def vprofile(request):
 
         if profile_form.is_valid() and vendor_form.is_valid():
             profile_form.save()
+            vendor = vendor_form.save(commit=False)
+            vendor_name = vendor_form.cleaned_data["vendor_name"]
+            slug = slugify(vendor_name) + "-" + str(vendor.user.id)
+            vendor.vendor_slug = slug
+            vendor.save()
             vendor_form.save()
             messages.success(request, "Profile Updated")
             return redirect("vprofile")

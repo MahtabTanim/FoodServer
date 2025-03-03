@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "account",
     "vendor",
     "menus",
+    "marketplace",
 ]
 
 MIDDLEWARE = [

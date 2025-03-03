@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from django.template.defaultfilters import slugify
 
 
 # Restrict Restaurant from accessing Customer Page
@@ -92,6 +93,7 @@ def registerVendor(request):
                 request, "Your User Account has been registered Successfully"
             )
             vendor_name = v_form.cleaned_data["vendor_name"]
+            slug = slugify(vendor_name) + "-" + str(user.id)
             vendor_licesnse = v_form.cleaned_data["vendor_licesnse"]
             user_profile = UserProfile.objects.get(user=user)
             vendor = Vendor.objects.create(
@@ -99,6 +101,7 @@ def registerVendor(request):
                 user_profile=user_profile,
                 vendor_name=vendor_name,
                 vendor_licesnse=vendor_licesnse,
+                vendor_slug=slug,
             )
             vendor.save()
             # send verification email
