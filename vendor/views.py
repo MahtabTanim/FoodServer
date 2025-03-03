@@ -168,6 +168,9 @@ def add_food(request):
 
     else:
         form = FoodItemForm()
+        form.fields["category"].queryset = Category.objects.filter(
+            vendor=get_vendor(request)
+        )
     context = {
         "foodItemForm": form,
     }
@@ -189,12 +192,14 @@ def edit_food(request, pk=None):
             food.save()
             form.save()
             return redirect("fooditmes_by_category", form.cleaned_data["category"].id)
-
         else:
             messages.error(request, "Invalid Information")
             print(form.errors)
     form = FoodItemForm(
         instance=food,
+    )
+    form.fields["category"].queryset = Category.objects.filter(
+        vendor=get_vendor(request)
     )
     context = {
         "food": food,
