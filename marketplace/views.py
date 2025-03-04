@@ -1,6 +1,8 @@
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
 from menus.models import Category, FoodItem
+from .models import Cart
 from vendor.models import Vendor
 from django.db.models import Prefetch
 
@@ -29,3 +31,35 @@ def vendor_detail(request, vendor_slug):
         "categories": categories,
     }
     return render(request, "marketplace/vendor_detail.html", context)
+
+
+def add_to_cart(request, food_id):
+    if request.user.is_authenticated:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            try:
+                fooditem = FoodItem.objects.get(id=food_id)
+                try:
+                    fcart = Cart.objects.get(fooditem=fooditem, user=request.user)
+                    fcart.quantity += 1
+                    fcart.save()
+                    return JsonResponse(
+                        {"status": "Success", "message": "Increased cart quantity "}
+                    )
+                except:
+                    fcart = Cart.objects.create(
+                        fooditem=fooditem, user=request.user, quantity=1
+                    )
+                    return JsonResponse(
+                        {"status": "Success", "message": "Created new cart "}
+                    )
+
+            except:
+                return JsonResponse(
+                    {"status": "failed", "message": "fooditem doesn't exists"}
+                )
+        else:
+            return JsonResponse({"status": "failed", "message": "not ajax request"})
+    else:
+        return JsonResponse(
+            {"status": "failed", "message": "user is not  authenticated"}
+        )
