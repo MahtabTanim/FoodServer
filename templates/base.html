@@ -11,6 +11,8 @@
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800" />
     <!-- Google Font Family Link End -->
 
+    <!-- Sweet Alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- CSS -->
     <link href="{% static 'assets/css/iconmoon.css' %}" rel="stylesheet" />
     <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
@@ -25,7 +27,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="{% static 'assets/js/modernizr.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.js' %}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
+
+    {% if '/profile/' in request.GET %}
+      <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
+    {% endif %}
     <script src="{% static 'assets/js/custom.js' %}"></script>
     <style>
       body,

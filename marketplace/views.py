@@ -1,6 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
+from marketplace.context_processors import get_cart_counter
 from menus.models import Category, FoodItem
 from .models import Cart
 from vendor.models import Vendor
@@ -26,31 +27,52 @@ def vendor_detail(request, vendor_slug):
             queryset=FoodItem.objects.filter(is_available=True),
         )
     )
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(user=request.user)
+    else:
+        cart_items = None
     context = {
         "vendor": vendor,
         "categories": categories,
+        "cart_items": cart_items,
     }
     return render(request, "marketplace/vendor_detail.html", context)
 
 
 def add_to_cart(request, food_id):
     if request.user.is_authenticated:
+        # checking AJAX request
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+
             try:
+                # Checking Food Item
                 fooditem = FoodItem.objects.get(id=food_id)
                 try:
-                    fcart = Cart.objects.get(fooditem=fooditem, user=request.user)
+                    # Checking Cart
+                    fcart = Cart.objects.get(user=request.user, fooditem=fooditem)
+                    # print("cart found with this food , incresing quantity")
                     fcart.quantity += 1
                     fcart.save()
                     return JsonResponse(
-                        {"status": "Success", "message": "Increased cart quantity "}
+                        {
+                            "status": "success",
+                            "message": "Increased cart quantity ",
+                            "cart_counter": get_cart_counter(request),
+                            "qty": fcart.quantity,
+                        }
                     )
                 except:
+                    # print("cart not found , creating new")
                     fcart = Cart.objects.create(
                         fooditem=fooditem, user=request.user, quantity=1
                     )
                     return JsonResponse(
-                        {"status": "Success", "message": "Created new cart "}
+                        {
+                            "status": "success",
+                            "message": "Created new cart ",
+                            "cart_counter": get_cart_counter(request),
+                            "qty": 1,
+                        }
                     )
 
             except:
@@ -61,5 +83,54 @@ def add_to_cart(request, food_id):
             return JsonResponse({"status": "failed", "message": "not ajax request"})
     else:
         return JsonResponse(
-            {"status": "failed", "message": "user is not  authenticated"}
+            {"status": "login_required", "message": "Please login to continue"}
+        )
+
+
+def remove_from_cart(request, food_id):
+    if request.user.is_authenticated:
+        # checking AJAX request
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+
+            try:
+                # Checking Food Item
+                fooditem = FoodItem.objects.get(id=food_id)
+                try:
+                    # Checking Cart
+                    fcart = Cart.objects.get(user=request.user, fooditem=fooditem)
+                    # print("cart found with this food , decresing quantity")
+                    if fcart.quantity > 1:
+                        fcart.quantity -= 1
+                        fcart.save()
+                    else:
+                        fcart.delete()
+                        fcart.quantity = 0
+                    return JsonResponse(
+                        {
+                            "status": "success",
+                            "message": "Decreased cart quantity ",
+                            "cart_counter": get_cart_counter(request),
+                            "qty": fcart.quantity,
+                        }
+                    )
+                except:
+                    # print("cart not found , doing nothing new")
+                    return JsonResponse(
+                        {
+                            "status": "failed",
+                            "message": "You do not have this item in your cart",
+                            "cart_counter": get_cart_counter(request),
+                            "qty": 0,
+                        }
+                    )
+
+            except:
+                return JsonResponse(
+                    {"status": "failed", "message": "fooditem doesn't exists"}
+                )
+        else:
+            return JsonResponse({"status": "failed", "message": "not ajax request"})
+    else:
+        return JsonResponse(
+            {"status": "login_required", "message": "Please login to continue"}
         )

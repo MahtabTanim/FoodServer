@@ -127,13 +127,16 @@
                               </div>
                               <div class="price-holder">
                                 <span class="price">${{ food.price }}</span>
-                                <a href="#" class="decrease-cart" style="margin-right: 18px;"><i class="icon-minus text-color"></i></a>
-                                <label id="quantity">10</label>
+                                <a href="#" class="remove-from-cart" data-id="{{ food.id }}" data-url="{% url 'remove_from_cart' food.id %}" style="margin-right: 18px;"><i class="icon-minus text-color"></i></a>
+                                <label id="quantity-{{ food.id }}">0</label>
                                 <a href="#" class="add-to-cart" data-id="{{ food.id }}" data-url="{% url 'add_to_cart' food.id %}"><i class="icon-plus4 text-color"></i></a>
                               </div>
                             </li>
                           {% endfor %}
                         </ul>
+                      {% endfor %}
+                      {% for item in cart_items %}
+                        <span class="item-qty d-none" id="quantity-{{ item.fooditem.id }}" data-qty="{{ item.quantity }}">{{ item.quantity }}</span>
                       {% endfor %}
                     </div>
                   </div>
