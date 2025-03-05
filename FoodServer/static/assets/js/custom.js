@@ -77,7 +77,7 @@ $(document).ready(function () {
                         title: response.status,
                         text: response.message,
                         icon: 'error',
-                        confirmButtonText: 'Cool',
+                        confirmButtonText: 'OK',
                     })
                 }
             },
@@ -118,7 +118,48 @@ $(document).ready(function () {
                         title: response.status,
                         text: response.message,
                         icon: 'error',
-                        confirmButtonText: 'Cool',
+                        confirmButtonText: 'OK',
+                    })
+                }
+            }
+        });
+    });
+
+
+    // Delete cart item
+    $(".delete-cart-item").on("click", function (e) {
+        e.preventDefault();
+        cart_id = $(this).attr("data-id")
+        url = $(this).attr("data-url")
+        console.log(cart_id, url)
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (response) {
+                if (response.status == "success") {
+                    cart_count = response.cart_counter['cart_count']
+                    $('#cart-counter').html(cart_count)
+                    Swal.fire({
+                        title: "Item has been deleted ",
+                        icon: "success",
+                    });
+                } else if (response.status == "login_required") {
+                    Swal.fire({
+                        title: response.status,
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'Login'
+                    }).then(function () {
+                        window.location = "/login"
+                    })
+
+                } else {
+                    console.log(response.status)
+                    Swal.fire({
+                        title: response.status,
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
                     })
                 }
             }

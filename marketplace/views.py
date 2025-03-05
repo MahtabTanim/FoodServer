@@ -6,6 +6,7 @@ from menus.models import Category, FoodItem
 from .models import Cart
 from vendor.models import Vendor
 from django.db.models import Prefetch
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -127,6 +128,42 @@ def remove_from_cart(request, food_id):
             except:
                 return JsonResponse(
                     {"status": "failed", "message": "fooditem doesn't exists"}
+                )
+        else:
+            return JsonResponse({"status": "failed", "message": "not ajax request"})
+    else:
+        return JsonResponse(
+            {"status": "login_required", "message": "Please login to continue"}
+        )
+
+
+@login_required(login_url="login")
+def cart(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    context = {
+        "cart_items": cart_items,
+    }
+    return render(request, "marketplace/cart.html", context)
+
+
+@login_required(login_url="login")
+def delete_cart_item(request, cart_id):
+    if request.user.is_authenticated:
+        # checking AJAX request
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            try:
+                cart_item = Cart.objects.filter(user=request.user, id=cart_id)
+                cart_item.delete()
+                return JsonResponse(
+                    {
+                        "status": "success",
+                        "message": "Cart item deleted successfully",
+                        "cart_counter": get_cart_counter(request),
+                    }
+                )
+            except:
+                return JsonResponse(
+                    {"status": "failed", "message": "cart item doesn't exists"}
                 )
         else:
             return JsonResponse({"status": "failed", "message": "not ajax request"})
