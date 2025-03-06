@@ -28,9 +28,9 @@
     <script src="{% static 'assets/js/modernizr.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.js' %}"></script>
 
-    {% if '/profile/' in request.GET %}
-      <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
-    {% endif %}
+    {% comment %} <!-- {% if '/profile/' in request.path %} --> {% endcomment %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_API_KEY }}&libraries=places&loading=async&callback=initAutoComplete" async defer></script>
+
     <script src="{% static 'assets/js/custom.js' %}"></script>
     <style>
       body,

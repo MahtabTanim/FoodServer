@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from .views import home
 from django.contrib import admin
 from django.urls import path, include
-from marketplace.views import cart
+from marketplace.views import cart, search
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -13,4 +13,6 @@ urlpatterns = [
     path("marketplace/", include("marketplace.urls")),
     # cart
     path("cart/", cart, name="cart"),
+    # serach
+    path("search/", search, name="search"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
