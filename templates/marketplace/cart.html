@@ -19,22 +19,23 @@
                   <div class="menu-itam-holder">
                     <div id="menu-item-list-6272" class="menu-itam-list">
                       {% if cart_items %}
-                        <ul>
+                        <ul id="menu-items-available">
                           {% for cart in cart_items %}
-                            <li>
+                            <li id="cart-{{ cart.id }}">
                               <div class="image-holder">
                                 <img src="{{ cart.fooditem.image.url }}" alt="" />
                               </div>
                               <div class="text-holder">
                                 <h6>{{ cart.fooditem }}</h6>
                                 <span>{{ cart.fooditem.description }}</span>
+                                <a href="{% url 'vendor_detail' cart.fooditem.vendor.vendor_slug %}" class="badge badge-warning">{{ cart.fooditem.vendor }}</a>
                               </div>
                               <div class="price-holder">
                                 <span class="price">${{ cart.fooditem.price }}</span>
-                                <a href="#" class="remove-from-cart" data-id="{{ cart.fooditem.id }}" data-url="{% url 'remove_from_cart' cart.fooditem.id %}" style="margin-right: 18px;"><i class="icon-minus text-color"></i></a>
+                                <a href="#" class="remove-from-cart" data-id="{{ cart.fooditem.id }}" data-cart="cart-{{ cart.id }}" data-url="{% url 'remove_from_cart' cart.fooditem.id %}" style="margin-right: 18px;"><i class="icon-minus text-color"></i></a>
                                 <label id="quantity-{{ cart.fooditem.id }}">0</label>
-                                <a href="#" class="add-to-cart" data-id="{{ cart.fooditem.id }}" data-url="{% url 'add_to_cart' cart.fooditem.id %}"><i class="icon-plus4 text-color"></i></a>
-                                <a href="#" class="delete-cart-item" data-id="{{ cart.id }}" data-url="{% url 'delete_cart_item' cart.id %}"><i class="icon-delete text-color"></i></a>
+                                <a href="#" class="add-to-cart" data-id="{{ cart.fooditem.id }}" data-cart="cart-{{ cart.id }}" data-url="{% url 'add_to_cart' cart.fooditem.id %}"><i class="icon-plus4 text-color"></i></a>
+                                <a href="#" class="delete-cart-item" data-id="{{ cart.id }}" data-cart="cart-{{ cart.id }}" data-url="{% url 'delete_cart_item' cart.id %}"><i class="icon-delete text-color"></i></a>
                               </div>
                             </li>
                           {% endfor %}
@@ -74,14 +75,14 @@
                           Subtotal
                           <span class="price float-right">
                             <span class="currency">$</span>
-                            <span id="subtotal">0</span>
+                            <span id="subtotal">{{ subtotal }}</span>
                           </span>
                         </li>
                         <li style="list-style-type: none;">
                           Tax
                           <span class="price float-right">
                             <span class="currency">$</span>
-                            <span id="tax">0</span>
+                            <span id="tax">{{ tax }}</span>
                           </span>
                         </li>
                       </ul>
@@ -89,7 +90,7 @@
                         TOTAL
                         <span class="price float-right">
                           <span class="currency">$</span>
-                          <span id="total">0</span>
+                          <span id="total">{{ total }}</span>
                         </span>
                       </li>
                     </div>

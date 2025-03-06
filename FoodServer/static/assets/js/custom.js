@@ -62,6 +62,8 @@ $(document).ready(function () {
                     cart_count = response.cart_counter['cart_count']
                     $('#cart-counter').html(cart_count)
                     $('#quantity-' + food_id).html(response.qty)
+                    //calculation section
+                    update_cart_prices(response)
                 } else if (response.status == "login_required") {
                     Swal.fire({
                         title: response.status,
@@ -90,18 +92,19 @@ $(document).ready(function () {
         e.preventDefault();
         food_id = $(this).attr("data-id")
         url = $(this).attr("data-url")
+        data_cart = $(this).attr("data-cart")
         $.ajax({
             type: 'GET',
             url: url,
-            // datat: {
-            //     'food_id': food_id
-            // },
             success: function (response) {
-                console.log(response.status)
                 if (response.status == "success") {
                     cart_count = response.cart_counter['cart_count']
                     $('#cart-counter').html(cart_count)
                     $('#quantity-' + food_id).html(response.qty)
+                    //calculation section
+                    update_cart_prices(response)
+                    //Delete item from fronend
+                    delete_cart_item(response.qty, data_cart)
                 } else if (response.status == "login_required") {
                     Swal.fire({
                         title: response.status,
@@ -113,7 +116,6 @@ $(document).ready(function () {
                     })
 
                 } else {
-                    console.log(response.status)
                     Swal.fire({
                         title: response.status,
                         text: response.message,
@@ -131,7 +133,8 @@ $(document).ready(function () {
         e.preventDefault();
         cart_id = $(this).attr("data-id")
         url = $(this).attr("data-url")
-        console.log(cart_id, url)
+        data_cart = $(this).attr("data-cart")
+        console.log(data_cart)
         $.ajax({
             type: 'GET',
             url: url,
@@ -139,10 +142,10 @@ $(document).ready(function () {
                 if (response.status == "success") {
                     cart_count = response.cart_counter['cart_count']
                     $('#cart-counter').html(cart_count)
-                    Swal.fire({
-                        title: "Item has been deleted ",
-                        icon: "success",
-                    });
+                    //calculation section
+                    update_cart_prices(response)
+                    //Delete item from fronend
+                    delete_cart_item(0, data_cart)
                 } else if (response.status == "login_required") {
                     Swal.fire({
                         title: response.status,
@@ -174,3 +177,31 @@ $(document).ready(function () {
     })
 
 })
+
+//Helper functions 
+
+//Delete cart item from homepage 
+function delete_cart_item(qty, data_cart) {
+    if (qty == 0) {
+        $('#' + data_cart).remove()
+        Swal.fire({
+            title: "Item has been deleted from cart ",
+            icon: "success",
+        });
+        if (document.getElementById("menu-items-available") && document.getElementById("menu-items-available").childElementCount == 0) {
+            $("#menu-items-available").html(
+                `<div class="text-center p-5"><h3>Cart is Empty</h3><h4>Go to <a href="/marketplace" class="text-warning">Marketplace</a></h4></div>`
+            )
+        }
+    }
+}
+
+function update_cart_prices(response) {
+    if (window.location.pathname == "/cart/") {
+        $('#subtotal').html(response.get_cart_total['subtotal'])
+        $('#tax').html(response.get_cart_total['tax'])
+        $('#total').html(response.get_cart_total['total'])
+    } else {
+        console.log("Not inside cart function")
+    }
+}

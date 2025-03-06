@@ -1,7 +1,7 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
-from marketplace.context_processors import get_cart_counter
+from marketplace.context_processors import get_cart_counter, get_cart_total
 from menus.models import Category, FoodItem
 from .models import Cart
 from vendor.models import Vendor
@@ -60,6 +60,7 @@ def add_to_cart(request, food_id):
                             "message": "Increased cart quantity ",
                             "cart_counter": get_cart_counter(request),
                             "qty": fcart.quantity,
+                            "get_cart_total": get_cart_total(request),
                         }
                     )
                 except:
@@ -73,6 +74,7 @@ def add_to_cart(request, food_id):
                             "message": "Created new cart ",
                             "cart_counter": get_cart_counter(request),
                             "qty": 1,
+                            "get_cart_total": get_cart_total(request),
                         }
                     )
 
@@ -100,18 +102,21 @@ def remove_from_cart(request, food_id):
                     # Checking Cart
                     fcart = Cart.objects.get(user=request.user, fooditem=fooditem)
                     # print("cart found with this food , decresing quantity")
+                    qty = 0
                     if fcart.quantity > 1:
                         fcart.quantity -= 1
                         fcart.save()
+                        qty = fcart.quantity
                     else:
                         fcart.delete()
-                        fcart.quantity = 0
+                        qty = 0
                     return JsonResponse(
                         {
                             "status": "success",
                             "message": "Decreased cart quantity ",
                             "cart_counter": get_cart_counter(request),
-                            "qty": fcart.quantity,
+                            "qty": qty,
+                            "get_cart_total": get_cart_total(request),
                         }
                     )
                 except:
@@ -122,6 +127,7 @@ def remove_from_cart(request, food_id):
                             "message": "You do not have this item in your cart",
                             "cart_counter": get_cart_counter(request),
                             "qty": 0,
+                            "get_cart_total": get_cart_total(request),
                         }
                     )
 
@@ -139,7 +145,7 @@ def remove_from_cart(request, food_id):
 
 @login_required(login_url="login")
 def cart(request):
-    cart_items = Cart.objects.filter(user=request.user)
+    cart_items = Cart.objects.filter(user=request.user).order_by("-updated_at")
     context = {
         "cart_items": cart_items,
     }
@@ -159,6 +165,7 @@ def delete_cart_item(request, cart_id):
                         "status": "success",
                         "message": "Cart item deleted successfully",
                         "cart_counter": get_cart_counter(request),
+                        "get_cart_total": get_cart_total(request),
                     }
                 )
             except:
