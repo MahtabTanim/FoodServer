@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.gis",
     "account",
     "vendor",
     "menus",
@@ -75,7 +76,7 @@ WSGI_APPLICATION = "FoodServer.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": config("DB_ENGINE", cast=str),
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER", cast=str),
         "PASSWORD": config("DB_PASSWORD"),
@@ -154,3 +155,5 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 
 GOOGLE_API_KEY = config("API_KEY")
+
+# Location settings
