@@ -80,7 +80,7 @@
                 {% for vendor in vendors %}
                   <li class="has-border">
                     <figure>
-                      <a href="#">
+                      <a href="{% url 'vendor_detail' vendor.vendor_slug %}">
                         <img src="{% if vendor.user_profile.profile_picture %}
                             {{ vendor.user_profile.profile_picture.url }}
                           {% else %}
@@ -90,6 +90,10 @@
                           alt="" />
                       </a>
                     </figure>
+                    <br />
+                    {% if vendor.kms %}
+                      <span class="mt-0"><small><b>{{ vendor.kms }} km</b> away</small></span>
+                    {% endif %}
                   </li>
                 {% endfor %}
               </ul>
@@ -117,7 +121,7 @@
                     <div class="list-post featured">
                       <div class="img-holder">
                         <figure>
-                          <a href="#">
+                          <a href="{% url 'vendor_detail' vendor.vendor_slug %}">
                             <img src="{% if vendor.user_profile.profile_picture %}
                                 {{ vendor.user_profile.profile_picture.url }}
                               {% else %}
@@ -131,7 +135,7 @@
                       </div>
                       <div class="text-holder">
                         <div class="post-title">
-                          <h5><a href="#">{{ vendor.vendor_name }}</a></h5>
+                          <h5><a href="{% url 'vendor_detail' vendor.vendor_slug %}">{{ vendor }}</a></h5>
                         </div>
                         <span>
                           {% if vendor.user_profile.city and vendor.user_profile.state %}
