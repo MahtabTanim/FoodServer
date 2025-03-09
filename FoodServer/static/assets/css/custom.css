@@ -29,3 +29,7 @@
     color: #000000 !important;
     text-transform: lowercase !important;
 }
+
+#opening_hours select {
+    padding: 5px 10px !important;
+}

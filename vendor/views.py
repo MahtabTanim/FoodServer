@@ -12,6 +12,10 @@ from menus.models import FoodItem
 from menus.form import CategoryForm, FoodItemForm
 from django.contrib import messages
 from django.template.defaultfilters import slugify
+from .forms import OpeningHourForm
+from .models import OpeningHour
+from django.http import JsonResponse
+from django.db import IntegrityError
 
 
 def get_vendor(request):
@@ -222,3 +226,77 @@ def delete_food(request, pk=None):
         messages.info(request, "Food Item Deleted ")
 
     return redirect("fooditmes_by_category", food.category.id)
+
+
+def opening_hours(request):
+    opening_hours = OpeningHour.objects.filter(vendor=get_vendor(request))
+    form = OpeningHourForm()
+    context = {
+        "opening_hours": opening_hours,
+        "form": form,
+    }
+    return render(request, "vendor/opening_hours.html", context)
+
+
+def add_opening_hours(request):
+    if request.user.is_authenticated:
+        if (
+            request.headers.get("X-Requested-With") == "XMLHttpRequest"
+            and request.method == "POST"
+        ):
+            day = request.POST["day"]
+            from_hour = request.POST["from_hour"]
+            to_hour = request.POST["to_hour"]
+            is_closed = request.POST["is_closed"]
+            if is_closed == "false":
+                is_closed = False
+            else:
+                is_closed = True
+            try:
+                hour = OpeningHour.objects.create(
+                    vendor=get_vendor(request),
+                    day=day,
+                    from_hour=from_hour,
+                    to_hour=to_hour,
+                    is_closed=is_closed,
+                )
+                if hour:
+                    day = OpeningHour.objects.get(id=hour.id)
+                    if day.is_closed:
+                        response = {
+                            "status": "success",
+                            "id": hour.id,
+                            "day": day.get_day_display(),
+                            "is_closed": "true",
+                        }
+                    else:
+                        response = {
+                            "status": "success",
+                            "id": hour.id,
+                            "day": day.get_day_display(),
+                            "from_hour": hour.from_hour,
+                            "to_hour": hour.to_hour,
+                            "is_closed": "false",
+                        }
+                    return JsonResponse(response)
+            except IntegrityError as e:
+                return JsonResponse(
+                    {
+                        "status": "failed",
+                        "message": str(e),
+                    }
+                )
+        else:
+            return JsonResponse(
+                {
+                    "status": "failed",
+                    "message": "Not POST/AJAX request",
+                }
+            )
+    else:
+        return JsonResponse(
+            {
+                "status": "failed",
+                "message": "Not authenticated",
+            }
+        )

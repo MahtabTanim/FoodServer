@@ -1,6 +1,7 @@
 from django.db import models
 from account.models import User, UserProfile
 from account.utils import send_notification
+from datetime import time, date, datetime
 
 # Create your models here.
 
@@ -38,3 +39,34 @@ class Vendor(models.Model):
                     send_notification(mail_subject, mail_template, context)
 
         return super(Vendor, self).save(*args, **kwargs)
+
+
+DayChoice = [
+    (1, "Monday"),
+    (2, "Tuesday"),
+    (3, "Wednesday"),
+    (4, "Thursday"),
+    (5, "Friday"),
+    (6, "Saturday"),
+    (7, "Sunday"),
+]
+HourChoice = [
+    (time(h, m).strftime("%I:%M %p"), time(h, m).strftime("%I:%M %p"))
+    for h in range(0, 24)
+    for m in (0, 30)
+]
+
+
+class OpeningHour(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    day = models.IntegerField(blank=True, null=True, choices=DayChoice)
+    from_hour = models.CharField(blank=True, null=True, choices=HourChoice)
+    to_hour = models.CharField(blank=True, null=True, choices=HourChoice)
+    is_closed = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["day", "from_hour"]
+        unique_together = ["vendor", "day", "from_hour", "to_hour"]
+
+    def __str__(self):
+        return self.get_day_display()

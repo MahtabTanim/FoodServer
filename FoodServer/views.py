@@ -21,9 +21,8 @@ def get_or_set_current_location(request):
 
 
 def home(request):
-    lat, lng = get_or_set_current_location(request)
-
-    if lat and lng:
+    if "lat" in request.GET or "lat" in request.session:
+        lat, lng = get_or_set_current_location(request)
         pnt = GEOSGeometry(f"POINT({lng} {lat})", srid=4326)
         vendors = (
             Vendor.objects.filter(is_approved=True, user__is_active=True)

@@ -175,6 +175,62 @@ $(document).ready(function () {
         let item_quantity = $(this).attr("data-qty");
         $('#' + item_id).html(item_quantity);
     })
+    $(".add-hours").on("click", function (e) {
+        e.preventDefault()
+        day = document.getElementById("id_day").value
+        from_hour = document.getElementById("id_from_hour").value;
+        to_hour = document.getElementById("id_to_hour").value;
+        is_closed = document.getElementById('id_is_closed').checked
+        csrf_token = $("input[name=csrfmiddlewaretoken]").val()
+        var url = $("#add_opening_hours_url").val()
+
+        if ((is_closed && day != "") || (day != "" && from_hour != "" && to_hour != "")) {
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: {
+                    'day': day,
+                    'from_hour': from_hour,
+                    'to_hour': to_hour,
+                    'is_closed': is_closed,
+                    'csrfmiddlewaretoken': csrf_token,
+                },
+                success: function (response) {
+                    console.log(response.status)
+                    if (response.status == "success") {
+                        id = response.id
+                        day = response.day;
+                        from_hour = response.from_hour;
+                        to_hour = response.to_hour;
+                        is_closed = response.is_closed;
+                        if (is_closed == "true") {
+                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>Closed</td><td><a href="#" class="remove_hour">Remove</a></td></tr>'
+                        }
+                        else {
+                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>' + from_hour + ' - ' + to_hour + '</td><td><a href="#" class="remove_hour">Remove</a></td></tr>'
+                        }
+                        $(".opening_hours").append(html);
+                        document.getElementById("opening_hours").reset();
+
+                    } else {
+                        console.log("status is failed")
+                        Swal.fire({
+                            title: "failed",
+                            icon: "error"
+                        });
+                    }
+                }
+
+            });
+        }
+        else {
+            Swal.fire({
+                title: "Please fill all the fields",
+                icon: "info"
+            });
+        }
+
+    });
 
 })
 
