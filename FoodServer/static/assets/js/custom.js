@@ -175,6 +175,7 @@ $(document).ready(function () {
         let item_quantity = $(this).attr("data-qty");
         $('#' + item_id).html(item_quantity);
     })
+    //Add Opening Hour
     $(".add-hours").on("click", function (e) {
         e.preventDefault()
         day = document.getElementById("id_day").value
@@ -204,18 +205,18 @@ $(document).ready(function () {
                         to_hour = response.to_hour;
                         is_closed = response.is_closed;
                         if (is_closed == "true") {
-                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>Closed</td><td><a href="#" class="remove_hour">Remove</a></td></tr>'
+                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>Closed</td><td><a href="#" data-url = "/vendor/opening_hours/remove/' + id + '" class="remove_hour">Remove</a></td></tr>'
                         }
                         else {
-                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>' + from_hour + ' - ' + to_hour + '</td><td><a href="#" class="remove_hour">Remove</a></td></tr>'
+                            html = '<tr id="hour-' + id + '"><td>  <b>' + day + '</b></td><td>' + from_hour + ' - ' + to_hour + '</td><td><a href="#" data-url = "/vendor/opening_hours/remove/' + id + '" class="remove_hour">Remove</a></td></tr>'
                         }
                         $(".opening_hours").append(html);
                         document.getElementById("opening_hours").reset();
+                        Swal.fire({ text: "Added New Entry", icon: "success" })
 
                     } else {
-                        console.log("status is failed")
                         Swal.fire({
-                            title: "failed",
+                            title: response.message,
                             icon: "error"
                         });
                     }
@@ -231,6 +232,27 @@ $(document).ready(function () {
         }
 
     });
+    //Remove Opening Hour
+    $(document).on("click", ".remove_hour", function (e) {
+        e.preventDefault();
+        url = $(this).attr("data-url");
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (response) {
+                if (response.status == "success") {
+                    Swal.fire({ text: "Deleted", icon: "error" })
+                    document.getElementById("hour-" + response.id).remove();
+                } else {
+                    Swal.fire({
+                        text: response.message,
+                        icon: 'error',
+                    })
+                }
+            }
+        });
+    });
+
 
 })
 

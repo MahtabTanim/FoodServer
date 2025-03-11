@@ -21,6 +21,23 @@ class Vendor(models.Model):
     def __str__(self):
         return self.vendor_name
 
+    def is_open(self):
+        is_open = None
+        current_openings = OpeningHour.objects.filter(
+            vendor=self, day=date.today().isoweekday()
+        )
+        current_time = datetime.now().strftime("%H:%M:%S")
+        for i in current_openings:
+            start_time = str(datetime.strptime(i.from_hour, "%I:%M %p").time())
+            end_time = str(datetime.strptime(i.to_hour, "%I:%M %p").time())
+
+            if current_time >= start_time and current_time <= end_time:
+                is_open = True
+                break
+            else:
+                is_open = False
+        return is_open
+
     def save(self, *args, **kwargs):
         if self.pk is not None:
             original = Vendor.objects.get(pk=self.pk)
@@ -65,7 +82,7 @@ class OpeningHour(models.Model):
     is_closed = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ["day", "from_hour"]
+        ordering = ["day", "-from_hour"]
         unique_together = ["vendor", "day", "from_hour", "to_hour"]
 
     def __str__(self):

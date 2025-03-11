@@ -33,7 +33,7 @@
                           {% endif %}
                         </td>
                         <td>
-                          <a href="#" class="remove_hour">Remove</a>
+                          <a href="#" data-url="{% url 'remove_opening_hour' hour.id %}" class="remove_hour">Remove</a>
                         </td>
                       </tr>
                     {% endfor %}

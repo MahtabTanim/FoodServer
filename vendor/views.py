@@ -283,7 +283,10 @@ def add_opening_hours(request):
                 return JsonResponse(
                     {
                         "status": "failed",
-                        "message": str(e),
+                        "message": from_hour
+                        + " to "
+                        + to_hour
+                        + " already exists for this day",
                     }
                 )
         else:
@@ -300,3 +303,18 @@ def add_opening_hours(request):
                 "message": "Not authenticated",
             }
         )
+
+
+def remove_opening_hour(request, pk=None):
+    if (
+        request.method == "GET"
+        and request.user.is_authenticated
+        and request.headers.get("X-Requested-With") == "XMLHttpRequest"
+    ):
+        oph = OpeningHour.objects.get(id=pk)
+        oph.delete()
+        return JsonResponse(
+            {"status": "success", "message": "Deleted Successfully", "id": pk}
+        )
+    else:
+        return JsonResponse({"m": "error"})
