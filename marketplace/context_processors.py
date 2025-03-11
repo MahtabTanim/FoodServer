@@ -1,4 +1,4 @@
-from marketplace.models import Cart
+from marketplace.models import Cart, Tax
 
 
 def get_cart_counter(request):
@@ -14,17 +14,35 @@ def get_cart_counter(request):
 
 
 def get_cart_total(request):
-    total = 0
+    total = 0.0
     subtotal = 0
-    tax = 10
+    total = 0
     if request.user.is_authenticated:
         try:
             cart_items = Cart.objects.filter(user=request.user)
             for cart in cart_items:
                 subtotal += (cart.quantity) * (cart.fooditem.price)
-            total = subtotal + tax
         except:
             total = 0
             subtotal = 0
-            tax = 0
-    return dict(subtotal=subtotal, total=total, tax=tax)
+
+    tax, tax_dict = get_tax_on_total(subtotal)
+    total = subtotal + tax
+    return dict(subtotal=subtotal, total=total, tax=tax, tax_dict=tax_dict)
+
+
+def get_tax_on_total(subtotal):
+    taxes = Tax.objects.filter(is_active=True)
+    tax_dict = {}
+    total_percentage = 0
+    # {"sale" : {"5":10}}
+    for t in taxes:
+        total_percentage += t.tax_percentage
+        tax_dict.update(
+            {
+                t.tax_type: {
+                    str(t.tax_percentage): round((subtotal * t.tax_percentage) / 100, 2)
+                }
+            }
+        )
+    return round((subtotal * total_percentage) / 100, 2), tax_dict

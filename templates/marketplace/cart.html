@@ -70,29 +70,42 @@
                 <div id="home" class="tab-pane in active">
                   <div class="menu-itam-holder">
                     <div id="menu-item-list-6272" class="menu-itam-list">
-                      <ul>
-                        <li style="list-style-type: none;">
+                      <ul style="list-style-type: none;">
+                        <li>
                           Subtotal
                           <span class="price float-right">
                             <span class="currency">$</span>
                             <span id="subtotal">{{ subtotal }}</span>
                           </span>
                         </li>
-                        <li style="list-style-type: none;">
-                          Tax
+
+                        {% for tax_type, value in tax_dict.items %}
+                          <li>
+                            {{ tax_type }}{% for percentage, amount in value.items %}
+                              <small>{{ percentage }}%</small>
+                              <span class="price float-right">
+                                <span class="currency">$</span>
+                                <span id="tax-{{ tax_type }}">{{ amount }}</span>
+                              </span>
+                            {% endfor %}
+                          </li>
+                        {% endfor %}
+
+                        <li>
+                          Total Tax
                           <span class="price float-right">
                             <span class="currency">$</span>
                             <span id="tax">{{ tax }}</span>
                           </span>
                         </li>
+                        <li style="font-weight: 600;">
+                          TOTAL
+                          <span class="price float-right">
+                            <span class="currency">$</span>
+                            <span id="total">{{ total }}</span>
+                          </span>
+                        </li>
                       </ul>
-                      <li style="list-style-type: none; font-weight: 600;">
-                        TOTAL
-                        <span class="price float-right">
-                          <span class="currency">$</span>
-                          <span id="total">{{ total }}</span>
-                        </span>
-                      </li>
                     </div>
                   </div>
                 </div>

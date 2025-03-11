@@ -142,9 +142,7 @@ $(document).ready(function () {
                 if (response.status == "success") {
                     cart_count = response.cart_counter['cart_count']
                     $('#cart-counter').html(cart_count)
-                    //calculation section
                     update_cart_prices(response)
-                    //Delete item from fronend
                     delete_cart_item(0, data_cart)
                 } else if (response.status == "login_required") {
                     Swal.fire({
@@ -279,6 +277,14 @@ function update_cart_prices(response) {
         $('#subtotal').html(response.get_cart_total['subtotal'])
         $('#tax').html(response.get_cart_total['tax'])
         $('#total').html(response.get_cart_total['total'])
+        tax_dict = response.get_cart_total['tax_dict']
+        console.log(tax_dict)
+        for (const [taxType, taxValue] of Object.entries(tax_dict)) {
+            for (const [percentage, value] of Object.entries(taxValue)) {
+                const taxElementId = `tax-${taxType}`;
+                document.getElementById(taxElementId).innerHTML = value;
+            }
+        }
     } else {
         console.log("Not inside cart function")
     }
