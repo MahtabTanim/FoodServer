@@ -37,7 +37,7 @@ def vendor_detail(request, vendor_slug):
             queryset=FoodItem.objects.filter(is_available=True),
         )
     )
-
+    current_openings = None
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user)
         hours = OpeningHour.objects.filter(vendor=vendor).order_by("day", "from_hour")

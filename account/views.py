@@ -159,6 +159,7 @@ def myAccount(request):
 @login_required(login_url="login")
 @user_passes_test(check_customer)
 def custDashboard(request):
+    # customer
     return render(request, "account/custDashboard.html")
 
 
