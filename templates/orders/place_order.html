@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <!-- Main Section Start -->
+  <div class="main-section pt-5">
+    <div class="page-section">
+      <div class="container">
+        <div class="row">
+          <!-- Cart items -->
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12">
+            <div class="tabs-holder horizontal">
+              <ul class="stickynav-tabs nav nav-tabs">
+                <li class="active">
+                  <a data-toggle="tab" href="#home"><i class="fa fa-cart-plus text-danger text-color" style="font-size: 22px;"></i>Confirm Billing Address</a>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div id="home" class="tab-pane in active">
+                  <div class="menu-itam-holder">
+                    <div id="menu-item-list-6272" class="menu-itam-list"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FUNDING SECTION -->
+
+          <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+            <div class="tabs-holder horizontal">
+              <ul class="stickynav-tabs nav nav-tabs">
+                <li class="active">
+                  <a data-toggle="tab" href="#home"><i class="fa fa-tag text-danger" style="font-size: 22px;"></i>Your Order</a>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div id="home" class="tab-pane in active">
+                  <div class="menu-itam-holder">
+                    <div id="menu-item-list-6272" class="menu-itam-list">
+                      <ul style="list-style-type: none;">
+                        <li>
+                          Subtotal
+                          <span class="price float-right">
+                            <span class="currency">$</span>
+                            <span id="subtotal">{{ subtotal }}</span>
+                          </span>
+                        </li>
+
+                        {% for tax_type, value in tax_dict.items %}
+                          <li>
+                            {{ tax_type }}{% for percentage, amount in value.items %}
+                              <small>{{ percentage }}%</small>
+                              <span class="price float-right">
+                                <span class="currency">$</span>
+                                <span id="tax-{{ tax_type }}">{{ amount }}</span>
+                              </span>
+                            {% endfor %}
+                          </li>
+                        {% endfor %}
+
+                        <li>
+                          Total Tax
+                          <span class="price float-right">
+                            <span class="currency">$</span>
+                            <span id="tax">{{ tax }}</span>
+                          </span>
+                        </li>
+                        <li style="font-weight: 600;">
+                          TOTAL
+                          <span class="price float-right">
+                            <span class="currency">$</span>
+                            <span id="total">{{ total }}</span>
+                          </span>
+                          <a href="{% url 'checkout' %}" class="btn btn-danger w-100 p-2 mt-3">Proceed To Checkout</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Main Section End -->
+{% endblock %}

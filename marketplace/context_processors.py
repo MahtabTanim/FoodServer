@@ -41,7 +41,9 @@ def get_tax_on_total(subtotal):
         tax_dict.update(
             {
                 t.tax_type: {
-                    str(t.tax_percentage): round((subtotal * t.tax_percentage) / 100, 2)
+                    str(t.tax_percentage): str(
+                        round((subtotal * t.tax_percentage) / 100, 2)
+                    )
                 }
             }
         )

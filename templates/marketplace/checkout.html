@@ -3,7 +3,8 @@
 {% block content %}
   <!-- Main Section Start -->
 
-  <form action="" method="POST">
+  <form action="{% url 'place_order' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     <div class="main-section pt-5">
       <div class="page-section">
         <div class="container">
@@ -118,7 +119,21 @@
                               <span class="currency">$</span>
                               <span id="total">{{ total }}</span>
                             </span>
-                            <button type="submit" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
+                          </li>
+                          <h5>Selecet Payment Method</h5>
+                          <div class="payment-method">
+                            <label>
+                              <input type="radio" name="payment_method" value="paypal" />
+                              <img src="{% static 'assets/images/PayPal.png' %}" class="w-25" alt="paypal" />
+                            </label>
+                            <label>
+                              <input type="radio" name="payment_method" value="bkash" />
+                              <img src="{% static 'assets/images/Bkash-Logo.png' %}" class="w-25" alt="bkash" />
+                            </label>
+                          </div>
+                          <span class="text-danger" id="payment_not_selected"></span>
+                          <li>
+                            <button type="submit" onclick="return paymethodConfirm();" class="btn btn-danger w-100 p-2 mt-3">PLACE ORDER</button>
                           </li>
                         </ul>
                       </div>
@@ -133,5 +148,25 @@
     </div>
     <!-- Form End -->
   </form>
+
+  <script>
+    function paymethodConfirm() {
+      var paymethod = $("input[name='payment_method']:checked").val()
+      if (!paymethod) {
+        $('#payment_not_selected').html('Please select a payment method')
+        return false
+      }
+      var conf = confirm('You have selected ' + paymethod + " as your payment method .\nClick 'OK' to continue.")
+      return conf
+    }
+    $('input[name="payment_method"]').on('change', function () {
+      var paymethod = $("input[name='payment_method']:checked").val()
+      if (paymethod) {
+        $('#payment_not_selected').html('')
+        return true
+      }
+    })
+  </script>
+
   <!-- Main Section End -->
 {% endblock %}
