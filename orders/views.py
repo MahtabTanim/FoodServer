@@ -1,11 +1,19 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from marketplace.forms import OrderForm
 from marketplace.models import Cart
 from marketplace.context_processors import get_cart_total
 from orders.utils import generate_order_number
 from .models import Order
 from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import get_user
+from .utils import send_payment_request
+from django.views.decorators.csrf import csrf_exempt
+from .models import Payment, OrderedFood
+from django.contrib.sessions.models import Session
+from .utils import send_notification
 
 
 # Create your views here.
@@ -19,8 +27,6 @@ def place_order(request):
     tax = get_cart_total(request)["tax"]
     total = get_cart_total(request)["total"]
     tax_data = get_cart_total(request)["tax_dict"]
-
-    print(subtotal, tax, total, tax_data)
     if request.method == "POST":
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -44,9 +50,103 @@ def place_order(request):
             order.order_number = generate_order_number(order.id)
             order.save()
             messages.success(request, "Order Saved")
-            return redirect("place_order")
+            context = {
+                "order": order,
+                "cart_items": cart_items,
+            }
+            return render(request, "orders/place_order.html", context)
 
         else:
             print(form.errors)
     context = {}
     return render(request, "orders/place_order.html", context)
+
+
+def order(request, order_id=None):
+    url = request.build_absolute_uri(reverse("status"))
+    response = send_payment_request(request, order_id, url)
+    return redirect(response["GatewayPageURL"])
+
+
+@csrf_exempt
+def status(request):
+    if request.method == "POST" or request.method == "post":
+        response = request.POST
+        order = Order.objects.get(order_number=response["tran_id"])
+        user = order.user
+        if response["status"] == "VALID":
+            # When the payment is successfull
+            # store payment details in Payment model
+            payment = Payment(
+                user=user,
+                transaction_id=response["bank_tran_id"],
+                payment_method=response["card_type"],
+                amount=response["amount"],
+                status=response["status"],
+            )
+            payment.save()
+            order.payment = payment
+            # $######
+            order.payment_method = response["card_type"]
+            order.is_ordered = True
+            order.save()
+            # MOVE THE CART ITEMS TO ORDERED FOOD MODEL
+            cart_items = Cart.objects.filter(user=user)
+            total = 0
+            vendors = list(set(item.fooditem.vendor for item in cart_items))
+            for item in cart_items:
+
+                ordered_food = OrderedFood(
+                    order=order,
+                    payment=payment,
+                    user=item.user,
+                    fooditem=item.fooditem,
+                    quantity=item.quantity,
+                    price=item.fooditem.price,
+                    amount=item.fooditem.price * item.quantity,
+                )
+                total += item.quantity
+                ordered_food.save()
+            # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
+            # send_notification(mail_subject, mail_template, context)
+            mail_subject = "Your order has been Confirmed"
+            mail_template = "orders/emails/order_confirmed_email.html"
+            context = {
+                "user": user,
+                "order": order,
+                "cart_items": cart_items,
+                "to_email": order.email,
+                "total_items": total,
+            }
+            send_notification(mail_subject, mail_template, context)
+            # SEND ORDER RECEIVED EMAIL TO THE VENDOR
+            mail_subject = "New order recieved"
+            mail_template = "orders/emails/order_recieved_email.html"
+            for vendor in vendors:
+                cart_items = Cart.objects.filter(fooditem__vendor=vendor, user=user)
+                context = {
+                    "vendor": vendor,
+                    "order": order,
+                    "cart_items": cart_items,
+                    "to_email": vendor.user.email,
+                }
+                send_notification(mail_subject, mail_template, context)
+            # CLEAR THE CART IF THE PAYMENT IS SUCCESS
+            Cart.objects.filter(user=user).delete()
+            return redirect("ssl_complete", response["val_id"], response["tran_id"])
+
+        else:
+            return HttpResponse("Payment Failed")
+    return HttpResponse("Hello world")
+
+
+def ssl_complete(request, val_id, tran_id):
+    order = Order.objects.get(order_number=tran_id)
+    ordered_foods = OrderedFood.objects.filter(order=order)
+    context = {
+        "order": order,
+        "ordered_foods": ordered_foods,
+        "subtotal": order.total - order.total_tax,
+        "tax_dictionary": order.tax_data,
+    }
+    return render(request, "orders/order_complete.html", context)

@@ -32,7 +32,6 @@ def marketplace(request):
 
 def vendor_detail(request, vendor_slug):
     vendor = Vendor.objects.get(vendor_slug=vendor_slug)
-    print(vendor.is_open())
     categories = Category.objects.filter(vendor=vendor).prefetch_related(
         Prefetch(
             "fooditems",
@@ -71,7 +70,6 @@ def add_to_cart(request, food_id):
                 try:
                     # Checking Cart
                     fcart = Cart.objects.get(user=request.user, fooditem=fooditem)
-                    # print("cart found with this food , incresing quantity")
                     fcart.quantity += 1
                     fcart.save()
                     return JsonResponse(
@@ -84,7 +82,6 @@ def add_to_cart(request, food_id):
                         }
                     )
                 except:
-                    # print("cart not found , creating new")
                     fcart = Cart.objects.create(
                         fooditem=fooditem, user=request.user, quantity=1
                     )
@@ -121,7 +118,6 @@ def remove_from_cart(request, food_id):
                 try:
                     # Checking Cart
                     fcart = Cart.objects.get(user=request.user, fooditem=fooditem)
-                    # print("cart found with this food , decresing quantity")
                     qty = 0
                     if fcart.quantity > 1:
                         fcart.quantity -= 1
@@ -140,7 +136,6 @@ def remove_from_cart(request, food_id):
                         }
                     )
                 except:
-                    # print("cart not found , doing nothing new")
                     return JsonResponse(
                         {
                             "status": "failed",

@@ -1,0 +1,29 @@
+{% autoescape off %}
+  Hi {{ user.first_name }}
+  <h1>Thank you for your order, {{ user.first_name }}!</h1>
+  <p>Your order has been confirmed and is being processed.</p>
+
+  <h2>Order Details:</h2>
+  <p>
+    <strong>Order ID:</strong> {{ order.id }}
+  </p>
+  <p>
+    <strong>Total Items:</strong> {{ total_items }}
+  </p>
+  <p>
+    <strong>Total Price:</strong> ${{ order.total }}
+  </p>
+  <p>
+    <strong>Transaction ID :</strong> {{ order.payment.transaction_id }}
+  </p>
+
+  <h3>Items in your order:</h3>
+  <ul>
+    {% for item in cart_items %}
+      <li>{{ item.fooditem.food_title }} - Quantity: {{ item.quantity }} - Price: ${{ item.fooditem.price }}</li>
+    {% endfor %}
+  </ul>
+
+  <p>If you have any questions, feel free to contact us .</p>
+  <p>Thank you for choosing us!</p>
+{% endautoescape %}

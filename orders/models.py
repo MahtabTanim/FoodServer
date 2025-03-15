@@ -4,13 +4,11 @@ from menus.models import FoodItem
 
 # Create your models here.
 
-payment_methods = [("Paypal", "paypal"), ("Bkash", "bkash")]
-
 
 class Payment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100)
-    payment_method = models.CharField(choices=payment_methods, max_length=100)
+    payment_method = models.CharField(default="ssl", max_length=100)
     amount = models.CharField(max_length=12)
     status = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)

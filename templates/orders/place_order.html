@@ -11,13 +11,59 @@
             <div class="tabs-holder horizontal">
               <ul class="stickynav-tabs nav nav-tabs">
                 <li class="active">
-                  <a data-toggle="tab" href="#home"><i class="fa fa-cart-plus text-danger text-color" style="font-size: 22px;"></i>Confirm Billing Address</a>
+                  <a data-toggle="tab" href="#home"><i class="fa fa-cart-plus text-danger text-color" style="font-size: 22px;"></i>Your Order</a>
                 </li>
               </ul>
               <div class="tab-content">
                 <div id="home" class="tab-pane in active">
                   <div class="menu-itam-holder">
-                    <div id="menu-item-list-6272" class="menu-itam-list"></div>
+                    <div id="menu-item-list-6272" class="menu-itam-list">
+                      <div>
+                        <h3>Items</h3>
+                        <table class="Table">
+                          <tr>
+                            <td></td>
+                            <td>Name</td>
+                            <td>Quantity</td>
+                            <td>Price</td>
+                          </tr>
+                          {% for item in cart_items %}
+                            <tr>
+                              <td>
+                                <img src="{{ item.fooditem.image.url }}" width="40" alt="food image" />
+                              </td>
+                              <td>{{ item.fooditem }}</td>
+                              <td>{{ item.quantity }}</td>
+                              <td>${{ item.fooditem.price }}</td>
+                            </tr>
+                          {% endfor %}
+                        </table>
+                      </div>
+                      <div class="billing_addy">
+                        <div>
+                          <b>{{ order.name }}</b>
+                        </div>
+                        <div>{{ order.address }}</div>
+                        <div>{{ order.city }} - {{ order.pin_code }}</div>
+                        <div>{{ order.state }}, {{ order.country }}</div>
+                        <div>
+                          <b>{{ order.phone }}</b>
+                        </div>
+                        <div>
+                          <b>{{ order.email }}</b>
+                        </div>
+                        <div>
+                          <b>{{ order.payment_method }}</b>
+                        </div>
+                        <br />
+                        <div>
+                          <div class="btn btn-warning">
+                            <a href="{% url 'checkout' %}">Edit</a>
+                          </div>
+                        </div>
+                        <br />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -71,7 +117,7 @@
                             <span class="currency">$</span>
                             <span id="total">{{ total }}</span>
                           </span>
-                          <a href="{% url 'checkout' %}" class="btn btn-danger w-100 p-2 mt-3">Proceed To Checkout</a>
+                          <a href="{% url 'order' order.order_number %}" class="btn btn-success w-100 p-2 mt-3">Pay</a>
                         </li>
                       </ul>
                     </div>

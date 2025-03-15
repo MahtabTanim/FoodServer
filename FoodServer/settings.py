@@ -160,4 +160,5 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 GOOGLE_API_KEY = config("API_KEY")
 
-# Location settings
+
+# SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
