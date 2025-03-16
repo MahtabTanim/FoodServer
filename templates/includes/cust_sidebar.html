@@ -4,8 +4,8 @@
       <li class="{% if '/customer/' == request.path or '/custDashboard/' == request.path %}active{% endif %}">
         <a href="{% url 'customer' %}"><i class="icon-dashboard3"></i>Dashboard</a>
       </li>
-      <li>
-        <a href="restaurant-restaurant.html"><i class="icon-add_shopping_cart"></i>My Orders</a>
+      <li class="{% if '/customer/myorders/' == request.path or '/customer/myorders/' in request.path %}active{% endif %}">
+        <a href="{% url 'myorders' %}"><i class="icon-add_shopping_cart"></i>My Orders</a>
       </li>
       <li class="{% if 'profile' in request.path %}active{% endif %}">
         <a href="{% url 'cprofile' %}"><i class="icon-build"></i>Profile Settings</a>
@@ -14,7 +14,7 @@
         <a href="restaurant-change-password.html"><i class="icon-unlock-alt"></i>Change Password</a>
       </li>
       <li>
-        <a class="logout-btn" href="registration.html"><i class="icon-log-out"></i>Signout</a>
+        <a class="logout-btn" href="{% url 'logout' %}"><i class="icon-log-out"></i>Signout</a>
       </li>
     </ul>
   </div>

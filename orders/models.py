@@ -45,7 +45,7 @@ class Order(models.Model):
         help_text="Data format: {'tax_type':{'tax_percentage':'tax_amount'}}",
     )
     total_tax = models.FloatField()
-    payment_method = models.CharField(max_length=25)
+    payment_method = models.CharField(max_length=50)
     status = models.CharField(max_length=15, choices=STATUS, default="New")
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

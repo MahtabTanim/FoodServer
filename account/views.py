@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.utils.html import format_html
 
 from account.models import User, UserProfile
+from orders.models import Order
 from vendor.models import Vendor
 from .forms import UserForm, VendorForm
 from django.contrib import messages, auth
@@ -159,8 +160,14 @@ def myAccount(request):
 @login_required(login_url="login")
 @user_passes_test(check_customer)
 def custDashboard(request):
-    # customer
-    return render(request, "account/custDashboard.html")
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by(
+        "-created_at"
+    )
+    context = {
+        "orders": orders[:5],
+        "total_orders": orders.count(),
+    }
+    return render(request, "account/custDashboard.html", context)
 
 
 @login_required(login_url="login")

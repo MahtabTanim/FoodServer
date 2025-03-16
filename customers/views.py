@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from account.models import UserProfile, User
 from django.contrib import messages
 
+from orders.models import Order, OrderedFood
+
 
 @login_required(login_url="login")
 @user_passes_test(check_customer)
@@ -37,3 +39,32 @@ def cprofile(request):
             "user_form": userForm,
         }
         return render(request, "customers/cprofile.html", context)
+
+
+@login_required(login_url="login")
+@user_passes_test(check_customer)
+def myorders(request):
+    print(request.path)
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by(
+        "-created_at"
+    )
+    context = {
+        "orders": orders,
+        "total_orders": orders.count(),
+    }
+    return render(request, "customers/myorders.html", context)
+
+
+def order_details(request, order_number):
+    try:
+        order = Order.objects.get(order_number=order_number)
+        ordered_foods = OrderedFood.objects.filter(order=order)
+        context = {
+            "order": order,
+            "ordered_foods": ordered_foods,
+            "subtotal": order.total - order.total_tax,
+            "tax_dictionary": order.tax_data,
+        }
+    except:
+        return redirect("custDashboard")
+    return render(request, "customers/order_details.html", context)

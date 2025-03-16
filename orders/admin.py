@@ -27,6 +27,7 @@ class OrderAdmin(admin.ModelAdmin):
         "payment_method",
         "status",
         "is_ordered",
+        "created_at",
     ]
     inlines = [
         OrderedFoodInline,

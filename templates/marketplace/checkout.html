@@ -122,13 +122,13 @@
                           </li>
                           <h5>Selecet Payment Method</h5>
                           <div class="payment-method">
-                            <label>
+                            {% comment %} <label>
                               <input type="radio" name="payment_method" value="paypal" />
                               <img src="{% static 'assets/images/PayPal.png' %}" class="w-25" alt="paypal" />
-                            </label>
+                            </label> {% endcomment %}
                             <label>
-                              <input type="radio" name="payment_method" value="bkash" />
-                              <img src="{% static 'assets/images/Bkash-Logo.png' %}" class="w-25" alt="bkash" />
+                              <input type="radio" name="payment_method" value="sslcommerce" />
+                              <img src="{% static 'assets/images/sslcommerce.png' %}" class="w-25" alt="sslcommerce" />
                             </label>
                           </div>
                           <span class="text-danger" id="payment_not_selected"></span>
