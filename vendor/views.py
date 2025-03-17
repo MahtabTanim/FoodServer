@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from account.forms import UserProfileForm, VendorForm
 from django.shortcuts import get_object_or_404, redirect
+
+from orders.models import Order, OrderedFood
 from .models import Vendor
 from account.models import UserProfile
 from django.contrib import messages
@@ -16,6 +18,8 @@ from .forms import OpeningHourForm
 from .models import OpeningHour
 from django.http import JsonResponse
 from django.db import IntegrityError
+from customers.forms import PassWordChangeForm
+from django.contrib import auth
 
 
 def get_vendor(request):
@@ -318,3 +322,67 @@ def remove_opening_hour(request, pk=None):
         )
     else:
         return JsonResponse({"m": "error"})
+
+
+@login_required(login_url="login")
+@user_passes_test(check_restaurant)
+def change_password(request):
+    if request.method == "POST":
+        form = PassWordChangeForm(request.POST, instance=request.user)
+        current_pass = request.POST["current_pass"]
+        password = request.POST["password"]
+        confirm_password = request.POST["confirm_password"]
+        user = request.user
+        if current_pass and password and confirm_password:
+            if user.check_password(current_pass):
+                if password == confirm_password:
+                    user.set_password(password)
+                    user.save()
+                    auth.login(request, user)
+                    return redirect("myAccount")
+                else:
+                    messages.error(request, "new password doesnt match")
+                    return redirect("change_password")
+            else:
+                messages.error(request, "Current Password Wrong")
+                return redirect("change_password")
+        else:
+            messages.error(request, "Invalid input")
+            return redirect("change_password")
+    else:
+        form = PassWordChangeForm()
+        context = {"form": form}
+        return render(request, "vendor/change_password.html", context)
+
+
+@login_required(login_url="login")
+@user_passes_test(check_restaurant)
+def all_orders(request):
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
+        "-created_at"
+    )
+    context = {
+        "orders": orders,
+        "total_order": orders.count(),
+    }
+    return render(request, "vendor/all_orders.html", context)
+
+
+@login_required(login_url="login")
+@user_passes_test(check_restaurant)
+def v_order_details(request, order_number):
+    vendor = Vendor.objects.get(user=request.user)
+    try:
+        order = Order.objects.get(order_number=order_number)
+        ordered_foods = OrderedFood.objects.filter(order=order)
+        print(ordered_foods)
+        context = {
+            "order": order,
+            "ordered_foods": ordered_foods,
+            "subtotal": order.total - order.total_tax,
+            "tax_dictionary": order.tax_data,
+        }
+    except:
+        return redirect("myAccount")
+    return render(request, "vendor/order_details.html", context)

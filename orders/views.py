@@ -94,8 +94,8 @@ def status(request):
             cart_items = Cart.objects.filter(user=user)
             total = 0
             vendors = list(set(item.fooditem.vendor for item in cart_items))
+            order.vendors.set(vendors)
             for item in cart_items:
-
                 ordered_food = OrderedFood(
                     order=order,
                     payment=payment,

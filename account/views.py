@@ -173,7 +173,17 @@ def custDashboard(request):
 @login_required(login_url="login")
 @user_passes_test(check_restaurant)
 def restaurantDashboard(request):
-    return render(request, "account/restaurantDashboard.html")
+    vendor = Vendor.objects.get(user=request.user)
+    orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
+        "-created_at"
+    )
+    context = {
+        "orders": orders,
+        "total_order": orders.count(),
+        "recent_orders": orders[:5],
+    }
+    print(orders)
+    return render(request, "account/restaurantDashboard.html", context)
 
 
 def activate(request, uidb64, token):

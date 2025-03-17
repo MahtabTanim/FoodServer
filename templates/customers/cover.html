@@ -28,8 +28,14 @@
               <span class="restaurant-title">{% if user_profile.user.first_name %}{{ user_profile.user.first_name }}{% endif %} {% if user_profile.user.last_name %}{{ user_profile.user.last_name }}{% endif %}</span>
               {% if user_profile.user.phone_number %}
                 <div class="text">
-                  <i class="icon-location"></i>
+                  <i class="icon-phone"></i>
                   <p>{{ user_profile.user.phone_number }}</p>
+                </div>
+              {% endif %}
+              {% if user_profile.user.email %}
+                <div class="text">
+                  <i class="icon-envelope"></i>
+                  <p>{{ user_profile.user.email }}</p>
                 </div>
               {% endif %}
             </div>

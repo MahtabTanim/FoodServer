@@ -38,4 +38,9 @@ urlpatterns = [
         views.remove_opening_hour,
         name="remove_opening_hour",
     ),
+    # change password
+    path("change_password/", views.change_password, name="change_password_vendor"),
+    # all orders
+    path("orders/", views.all_orders, name="all_orders"),
+    path("orders/<str:order_number>", views.v_order_details, name="v_order_details"),
 ]

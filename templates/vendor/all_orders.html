@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+  {% include 'includes/alerts.html' %}
   <!-- Main Section Start -->
   <div class="main-section">
-    {% include 'customers/cover.html' %}
+    {% include 'includes/cover.html' %}
     <div class="page-section account-header buyer-logged-in">
       <div class="container">
         <div class="row">
           <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
             <!-- Load Sidebar -->
-            {% include 'includes/cust_sidebar.html' %}
+            {% include 'includes/res_sidebar.html' %}
           </div>
           <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
             <div class="user-dashboard loader-holder">
@@ -41,7 +42,7 @@
                               {% for order in orders %}
                                 <tr>
                                   <td>
-                                    <a href="{% url 'order_details' order %}" class="text-dark">{{ order }}</a>
+                                    <a href="{% url 'v_order_details' order %}" class="text-dark">{{ order }}</a>
                                   </td>
                                   <td>{{ order.created_at }}</td>
                                   <td>{{ order.name }}</td>
@@ -50,7 +51,7 @@
                                     <span class="badge badge-success">{{ order.status }}</span>
                                   </td>
                                   <td>
-                                    <a class="btn btn-danger btn-sm" href="{% url 'order_details' order %}">Details</a>
+                                    <a class="btn btn-danger btn-sm" href="{% url 'v_order_details' order %}">Details</a>
                                   </td>
                                 </tr>
                               {% endfor %}
@@ -71,5 +72,4 @@
     </div>
   </div>
   <!-- Main Section End -->
-  {% include 'includes/alerts.html' %}
 {% endblock %}

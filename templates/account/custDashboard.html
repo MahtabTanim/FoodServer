@@ -57,7 +57,7 @@
                             {% for order in orders %}
                               <li class="order-heading-titles">
                                 <div>
-                                  <a href="#" data-toggle="modal" data-target="#order-det-22606">{{ order }}</a>
+                                  <a href="{% url 'order_details' order %}">{{ order }}</a>
                                 </div>
                                 <div>{{ order.created_at }}</div>
                                 <div>{{ order.name }}</div>

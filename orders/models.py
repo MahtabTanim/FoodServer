@@ -1,6 +1,7 @@
 from django.db import models
 from account.models import User
 from menus.models import FoodItem
+from vendor.models import Vendor
 
 # Create your models here.
 
@@ -29,6 +30,7 @@ class Order(models.Model):
     payment = models.ForeignKey(
         Payment, on_delete=models.SET_NULL, blank=True, null=True
     )
+    vendors = models.ManyToManyField(Vendor, blank=True)
     order_number = models.CharField(max_length=20)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -44,6 +46,7 @@ class Order(models.Model):
         blank=True,
         help_text="Data format: {'tax_type':{'tax_percentage':'tax_amount'}}",
     )
+    total_data = models.JSONField(blank=True, null=True)
     total_tax = models.FloatField()
     payment_method = models.CharField(max_length=50)
     status = models.CharField(max_length=15, choices=STATUS, default="New")
@@ -58,6 +61,10 @@ class Order(models.Model):
 
     def __str__(self):
         return self.order_number
+
+    @property
+    def ordered_to(self):
+        return ",".join([str(i) for i in self.vendors.all()])
 
 
 class OrderedFood(models.Model):
