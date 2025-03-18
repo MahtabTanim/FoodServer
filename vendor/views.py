@@ -20,6 +20,8 @@ from django.http import JsonResponse
 from django.db import IntegrityError
 from customers.forms import PassWordChangeForm
 from django.contrib import auth
+from django.db.models import Sum
+import copy
 
 
 def get_vendor(request):
@@ -362,9 +364,25 @@ def all_orders(request):
     orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
         "-created_at"
     )
+    order_totals = dict()
+    for order in orders:
+        tax_data = order.total_data[str(vendor.id)]
+        t_data = {}
+        for key, val in tax_data.items():
+            subtotal = key
+            t_data = val
+        tax_data = t_data
+        total_tax = 0
+        for tax, data in order.tax_data.items():
+            for key, val in data.items():
+                total_tax += round(float(subtotal) * float(key) / 100, 2)
+        total = round(float(subtotal) + float(total_tax), 2)
+        order_totals.update({str(order): str(total)})
+
     context = {
         "orders": orders,
         "total_order": orders.count(),
+        "order_totals": order_totals,
     }
     return render(request, "vendor/all_orders.html", context)
 
@@ -375,13 +393,26 @@ def v_order_details(request, order_number):
     vendor = Vendor.objects.get(user=request.user)
     try:
         order = Order.objects.get(order_number=order_number)
-        ordered_foods = OrderedFood.objects.filter(order=order)
-        print(ordered_foods)
+        ordered_foods = OrderedFood.objects.filter(order=order, fooditem__vendor=vendor)
+        subtotal = ordered_foods.aggregate(Sum("amount"))["amount__sum"]
+        tax_data = order.total_data[str(vendor.id)]
+        t_data = {}
+        for key, val in tax_data.items():
+            subtotal = key
+            t_data = val
+        tax_data = t_data
+        total_tax = 0
+        for tax, data in order.tax_data.items():
+            for key, val in data.items():
+                total_tax += round(float(subtotal) * float(key) / 100, 2)
         context = {
+            "vendor": vendor,
+            "subtotal": round(float(subtotal), 2),
+            "total_tax": total_tax,
+            "total": round(float(subtotal) + total_tax, 2),
             "order": order,
             "ordered_foods": ordered_foods,
-            "subtotal": order.total - order.total_tax,
-            "tax_dictionary": order.tax_data,
+            "tax_dictionary": tax_data,
         }
     except:
         return redirect("myAccount")

@@ -26,9 +26,9 @@
                   </div>
                   <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="card">
-                      <div class="card-header">Total Revenue</div>
+                      <div class="card-header">Total Sell</div>
                       <div class="card-body text-center">
-                        <a href="#"><h5 class="card-title">34400$</h5></a>
+                        <a href="#"><h5 class="card-title">{{ total_rev }}</h5></a>
                       </div>
                     </div>
                   </div>
@@ -70,7 +70,13 @@
                                 </div>
                                 <div>{{ order.created_at }}</div>
                                 <div>{{ order.name }}</div>
-                                <div>$ {{ order.total }}</div>
+                                <div>
+                                  ${% for key, value in order_totals.items %}
+                                    {% if key == order.order_number %}
+                                      {{ value }}
+                                    {% endif %}
+                                  {% endfor %}
+                                </div>
                                 <div>
                                   <span class="order-status" style="background-color: #047a06;">{{ order.status }}</span>
                                 </div>

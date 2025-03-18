@@ -4,6 +4,7 @@ from menus.models import FoodItem
 from vendor.models import Vendor
 
 # Create your models here.
+request_object = ""
 
 
 class Payment(models.Model):
@@ -65,6 +66,27 @@ class Order(models.Model):
     @property
     def ordered_to(self):
         return ",".join([str(i) for i in self.vendors.all()])
+
+    @property
+    def get_total_by_vendor(self):
+        vendor = Vendor.objects.get(user=request_object.user)
+        total_data = self.total_data
+        tax_data = total_data[str(vendor.id)]
+        print(tax_data)
+        t_data = {}
+        for key, val in tax_data.items():
+            subtotal = key
+            t_data = val
+        tax_data = t_data
+        total_tax = 0
+        for tax, data in tax_data.items():
+            for key, val in data.items():
+                total_tax += round(float(subtotal) * float(key) / 100, 2)
+        return {
+            str(total_tax + round(float(subtotal), 2)): {
+                str(round(float(subtotal), 2)): str(total_tax)
+            }
+        }
 
 
 class OrderedFood(models.Model):

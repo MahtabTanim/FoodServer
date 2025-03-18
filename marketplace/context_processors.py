@@ -35,7 +35,6 @@ def get_tax_on_total(subtotal):
     taxes = Tax.objects.filter(is_active=True)
     tax_dict = {}
     total_percentage = 0
-    # {"sale" : {"5":10}}
     for t in taxes:
         total_percentage += t.tax_percentage
         tax_dict.update(

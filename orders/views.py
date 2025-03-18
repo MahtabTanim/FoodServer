@@ -9,7 +9,7 @@ from .models import Order
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import get_user
-from .utils import send_payment_request
+from .utils import send_payment_request, vendors_pecific_tax_details
 from django.views.decorators.csrf import csrf_exempt
 from .models import Payment, OrderedFood
 from django.contrib.sessions.models import Session
@@ -131,6 +131,13 @@ def status(request):
                     "to_email": vendor.user.email,
                 }
                 send_notification(mail_subject, mail_template, context)
+
+            # vendor specific details
+            # {vendorid : {"subtotal" : {tax_data}}}
+            order.total_data = vendors_pecific_tax_details(
+                order.order_number, vendors, order.tax_data
+            )
+            order.save()
             # CLEAR THE CART IF THE PAYMENT IS SUCCESS
             Cart.objects.filter(user=user).delete()
             return redirect("ssl_complete", response["val_id"], response["tran_id"])
@@ -146,7 +153,7 @@ def ssl_complete(request, val_id, tran_id):
     context = {
         "order": order,
         "ordered_foods": ordered_foods,
-        "subtotal": order.total - order.total_tax,
+        "subtotal": round(order.total - order.total_tax, 2),
         "tax_dictionary": order.tax_data,
     }
     return render(request, "orders/order_complete.html", context)

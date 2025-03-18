@@ -13,7 +13,7 @@
       <li class="{% if 'opening_hours' in request.path %}active{% endif %}">
         <a href="{% url 'opening_hours' %}"><i class="icon-menu5"></i>Opening Hours</a>
       </li>
-      <li class="{% if request.path == '/vendor/orders/' %}active{% endif %}">
+      <li class="{% if request.path == '/vendor/orders/' or 'orders' in request.path %}active{% endif %}">
         <a href="{% url 'all_orders' %}"><i class="icon-add_shopping_cart"></i>Orders</a>
       </li>
       <li>

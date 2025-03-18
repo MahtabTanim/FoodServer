@@ -46,7 +46,13 @@
                                   </td>
                                   <td>{{ order.created_at }}</td>
                                   <td>{{ order.name }}</td>
-                                  <td>$ {{ order.total }}</td>
+                                  <td>
+                                    {% for key, value in order_totals.items %}
+                                      {% if key == order.order_number %}
+                                        <div>$ {{ value }}</div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  </td>
                                   <td>
                                     <span class="badge badge-success">{{ order.status }}</span>
                                   </td>

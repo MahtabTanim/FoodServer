@@ -1,12 +1,13 @@
 import datetime
 from sslcommerz_lib import SSLCOMMERZ
 from marketplace.context_processors import get_cart_counter
-from orders.models import Order
+from orders.models import Order, OrderedFood
 from account.models import UserProfile
 from marketplace.models import Cart
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.conf import settings as stngs
+from django.db.models import Sum
 
 
 def generate_order_number(pk):
@@ -70,3 +71,20 @@ def send_notification(mail_subject, mail_template, context):
     mail = EmailMessage(mail_subject, message, from_email, to=[to_email])
     mail.send()
     print("Notification email sent")
+
+
+# {vendorid : {"subtotal" : {tax_data}}}
+def vendors_pecific_tax_details(order_number, vendors, tax_data):
+    tax_dict = {}
+    order = Order.objects.get(order_number=order_number)
+    for vendor in vendors:
+        ordered_foods = OrderedFood.objects.filter(order=order, fooditem__vendor=vendor)
+        subtotal = ordered_foods.aggregate(Sum("amount"))["amount__sum"]
+        tax_data = {}
+        for tax, data in order.tax_data.items():
+            for key, val in data.items():
+                tax_data.update(
+                    {tax: {str(key): str(round(float(subtotal) * float(key) / 100, 2))}}
+                )
+        tax_dict.update({str(vendor.id): {str(subtotal): tax_data}})
+    return tax_dict

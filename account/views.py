@@ -177,12 +177,29 @@ def restaurantDashboard(request):
     orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
         "-created_at"
     )
+    order_totals = dict()
+    total_rev = 0
+    for order in orders:
+        tax_data = order.total_data[str(vendor.id)]
+        t_data = {}
+        for key, val in tax_data.items():
+            subtotal = key
+            t_data = val
+        tax_data = t_data
+        total_tax = 0
+        for tax, data in order.tax_data.items():
+            for key, val in data.items():
+                total_tax += round(float(subtotal) * float(key) / 100, 2)
+        total = round(float(subtotal) + float(total_tax), 2)
+        total_rev += total
+        order_totals.update({str(order): str(total)})
     context = {
         "orders": orders,
         "total_order": orders.count(),
         "recent_orders": orders[:5],
+        "order_totals": order_totals,
+        "total_rev": total_rev,
     }
-    print(orders)
     return render(request, "account/restaurantDashboard.html", context)
 
 
