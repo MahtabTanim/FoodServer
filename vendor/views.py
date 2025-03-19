@@ -3,6 +3,7 @@ from django.shortcuts import render
 from account.forms import UserProfileForm, VendorForm
 from django.shortcuts import get_object_or_404, redirect
 
+from account.utils import generate_total_by_vendor
 from orders.models import Order, OrderedFood
 from .models import Vendor
 from account.models import UserProfile
@@ -364,21 +365,8 @@ def all_orders(request):
     orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
         "-created_at"
     )
-    order_totals = dict()
-    for order in orders:
-        tax_data = order.total_data[str(vendor.id)]
-        t_data = {}
-        for key, val in tax_data.items():
-            subtotal = key
-            t_data = val
-        tax_data = t_data
-        total_tax = 0
-        for tax, data in order.tax_data.items():
-            for key, val in data.items():
-                total_tax += round(float(subtotal) * float(key) / 100, 2)
-        total = round(float(subtotal) + float(total_tax), 2)
-        order_totals.update({str(order): str(total)})
-
+    data = generate_total_by_vendor(orders, vendor)
+    order_totals = data.get("order_totals")
     context = {
         "orders": orders,
         "total_order": orders.count(),

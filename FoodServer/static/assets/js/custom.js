@@ -47,6 +47,7 @@ function onPlaceChanged() {
 }
 //add to cart 
 $(document).ready(function () {
+    $('#ordersTable').DataTable();
     $(".add-to-cart").on("click", function (e) {
         e.preventDefault();
         food_id = $(this).attr('data-id')

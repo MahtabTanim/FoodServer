@@ -33,3 +33,7 @@
 #opening_hours select {
     padding: 5px 10px !important;
 }
+
+div.dt-container .dt-search input {
+    border: none !important;
+}

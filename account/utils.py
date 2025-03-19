@@ -61,3 +61,26 @@ def send_notification(mail_subject, mail_template, context):
     mail = EmailMessage(mail_subject, message, from_email, to=[to_email])
     mail.send()
     print("Notification email sent")
+
+
+def generate_total_by_vendor(orders, vendor):
+    order_totals = dict()
+    total_rev = 0
+    for order in orders:
+        tax_data = order.total_data[str(vendor.id)]
+        t_data = {}
+        for key, val in tax_data.items():
+            subtotal = key
+            t_data = val
+        tax_data = t_data
+        total_tax = 0
+        for tax, data in order.tax_data.items():
+            for key, val in data.items():
+                total_tax += round(float(subtotal) * float(key) / 100, 2)
+        total = round(float(subtotal) + float(total_tax), 2)
+        total_rev += total
+        order_totals.update({str(order): str(total)})
+    return {
+        "order_totals": order_totals,
+        "total_rev": total_rev,
+    }

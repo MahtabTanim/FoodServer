@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.utils.html import format_html
@@ -7,7 +8,12 @@ from orders.models import Order
 from vendor.models import Vendor
 from .forms import UserForm, VendorForm
 from django.contrib import messages, auth
-from .utils import detectUser, send_verification_email, send_password_reset_email
+from .utils import (
+    detectUser,
+    generate_total_by_vendor,
+    send_verification_email,
+    send_password_reset_email,
+)
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.utils.http import urlsafe_base64_decode
@@ -177,28 +183,22 @@ def restaurantDashboard(request):
     orders = Order.objects.filter(vendors__in=[vendor.id], is_ordered=True).order_by(
         "-created_at"
     )
-    order_totals = dict()
-    total_rev = 0
-    for order in orders:
-        tax_data = order.total_data[str(vendor.id)]
-        t_data = {}
-        for key, val in tax_data.items():
-            subtotal = key
-            t_data = val
-        tax_data = t_data
-        total_tax = 0
-        for tax, data in order.tax_data.items():
-            for key, val in data.items():
-                total_tax += round(float(subtotal) * float(key) / 100, 2)
-        total = round(float(subtotal) + float(total_tax), 2)
-        total_rev += total
-        order_totals.update({str(order): str(total)})
+    data = generate_total_by_vendor(orders, vendor)
+    order_totals = data.get("order_totals")
+    total_rev = data.get("total_rev")
+    # curretn month revenue
+    month = datetime.datetime.now().month
+    current_month_orders = orders.filter(created_at__month=month)
+    current_month_total = generate_total_by_vendor(current_month_orders, vendor).get(
+        "total_rev"
+    )
     context = {
         "orders": orders,
         "total_order": orders.count(),
         "recent_orders": orders[:5],
         "order_totals": order_totals,
         "total_rev": total_rev,
+        "current_month_rev": current_month_total,
     }
     return render(request, "account/restaurantDashboard.html", context)
 
