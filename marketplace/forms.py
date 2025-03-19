@@ -3,6 +3,8 @@ from django import forms
 
 
 class OrderForm(forms.ModelForm):
+    phone = forms.CharField(required=True)
+
     class Meta:
         model = Order
         fields = [

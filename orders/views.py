@@ -107,8 +107,14 @@ def status(request):
                 )
                 total += item.quantity
                 ordered_food.save()
+
+            # vendor specific details
+            # {vendorid : {"subtotal" : {tax_data}}}
+            order.total_data = vendors_pecific_tax_details(
+                order.order_number, vendors, order.tax_data
+            )
+            order.save()
             # SEND ORDER CONFIRMATION EMAIL TO THE CUSTOMER
-            # send_notification(mail_subject, mail_template, context)
             mail_subject = "Your order has been Confirmed"
             mail_template = "orders/emails/order_confirmed_email.html"
             context = {
@@ -117,6 +123,7 @@ def status(request):
                 "cart_items": cart_items,
                 "to_email": order.email,
                 "total_items": total,
+                "total": order.total,
             }
             send_notification(mail_subject, mail_template, context)
             # SEND ORDER RECEIVED EMAIL TO THE VENDOR
@@ -131,13 +138,6 @@ def status(request):
                     "to_email": vendor.user.email,
                 }
                 send_notification(mail_subject, mail_template, context)
-
-            # vendor specific details
-            # {vendorid : {"subtotal" : {tax_data}}}
-            order.total_data = vendors_pecific_tax_details(
-                order.order_number, vendors, order.tax_data
-            )
-            order.save()
             # CLEAR THE CART IF THE PAYMENT IS SUCCESS
             Cart.objects.filter(user=user).delete()
             return redirect("ssl_complete", response["val_id"], response["tran_id"])

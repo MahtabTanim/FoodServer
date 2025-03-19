@@ -44,14 +44,12 @@ def send_payment_request(request, order_id, url):
     post_body["fail_url"] = url
     post_body["cancel_url"] = url
     post_body["emi_option"] = 0
-    post_body["cus_name"] = request.user.first_name + request.user.last_name
-    post_body["cus_email"] = request.user.email
-    post_body["cus_phone"] = request.user.phone_number
-    post_body["cus_add1"] = user_profile.address
-    post_body["cus_city"] = user_profile.city
-    post_body["cus_country"] = (
-        user_profile.country if user_profile.country else "Bangladesh"
-    )
+    post_body["cus_name"] = order.first_name + order.last_name
+    post_body["cus_email"] = order.email
+    post_body["cus_phone"] = order.phone
+    post_body["cus_add1"] = order.address
+    post_body["cus_city"] = order.city
+    post_body["cus_country"] = order.country if order.country else "Bangladesh"
 
     post_body["shipping_method"] = "NO"
     post_body["multi_card_name"] = ""
@@ -69,6 +67,7 @@ def send_notification(mail_subject, mail_template, context):
     message = render_to_string(mail_template, context)
     to_email = context["to_email"]
     mail = EmailMessage(mail_subject, message, from_email, to=[to_email])
+    mail.content_subtype = "html"
     mail.send()
     print("Notification email sent")
 
