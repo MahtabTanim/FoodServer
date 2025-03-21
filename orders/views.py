@@ -124,6 +124,7 @@ def status(request):
                 "to_email": order.email,
                 "total_items": total,
                 "total": order.total,
+                "tax_data": order.tax_data,
             }
             send_notification(mail_subject, mail_template, context)
             # SEND ORDER RECEIVED EMAIL TO THE VENDOR
@@ -131,11 +132,28 @@ def status(request):
             mail_template = "orders/emails/order_recieved_email.html"
             for vendor in vendors:
                 cart_items = Cart.objects.filter(fooditem__vendor=vendor, user=user)
+                vendor_total_details = order.total_data.get(str(vendor.id))
+                total_percentage = 0.0
+                total = 0.0
+                tax_data = {}
+                for key, val in vendor_total_details.items():
+                    total = key
+                    tax_data = val
+                    for k, percentage in tax_data.items():
+                        for x, y in percentage.items():
+                            total_percentage += float(x)
+                total_with_tax = round(
+                    float(total) + (float(total) * float(total_percentage) / 100), 2
+                )
+                print(total_with_tax)
                 context = {
                     "vendor": vendor,
                     "order": order,
                     "cart_items": cart_items,
                     "to_email": vendor.user.email,
+                    "total": total,
+                    "tax_data": tax_data,
+                    "total_with_tax": total_with_tax,
                 }
                 send_notification(mail_subject, mail_template, context)
             # CLEAR THE CART IF THE PAYMENT IS SUCCESS

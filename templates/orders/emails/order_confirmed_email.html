@@ -40,7 +40,7 @@
             <p>Thanks for your order</p>
             <p>Your order has been confirmed and is being processed.</p>
             <h4>Order Details:</h4>
-            <p>Order ID: {{ order.id }}</p>
+            <p>Order ID: {{ order }}</p>
             <p>Total Items: {{ total_items }}</p>
             <p>Total Price: ${{ order.total }}</p>
             <p>Transaction ID : {{ order.payment.transaction_id }}</p>
@@ -59,6 +59,27 @@
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ item.fooditem.food_title }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">{{ item.quantity }}</td>
                     <td style="padding: 8px; border: 1px solid #ddd;">${{ item.fooditem.price }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <h4>Tax Details</h4>
+            <table>
+              <thead>
+                <tr style="background-color: #f2f2f2;">
+                  <th style="padding: 8px; border: 1px solid #ddd;">Tax Type</th>
+                  <th style="padding: 8px; border: 1px solid #ddd;">%</th>
+                  <th style="padding: 8px; border: 1px solid #ddd;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tax_type, value in tax_data.items %}
+                  <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">{{ tax_type }}</td>
+                    {% for percentage, amount in value.items %}
+                      <td style="padding: 8px; border: 1px solid #ddd;">{{ percentage }}</td>
+                      <td style="padding: 8px; border: 1px solid #ddd;">${{ amount }}</td>
+                    {% endfor %}
                   </tr>
                 {% endfor %}
               </tbody>
