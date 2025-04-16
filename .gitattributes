@@ -1,0 +1,6 @@
+*.html linguist-detectable=true
+*.js linguist-detectable=true
+*.css linguist-detectable=true
+*.py linguist-detectable=true
+static/* linguist-documentation
+assets/* linguist-documentation
