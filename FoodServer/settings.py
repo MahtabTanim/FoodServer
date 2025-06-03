@@ -88,7 +88,7 @@ WSGI_APPLICATION = "FoodServer.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": config("DB_NAME"),
+        "NAME": "FoodServer",
         "USER": config("DB_USER", cast=str),
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST"),

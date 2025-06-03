@@ -179,3 +179,4 @@ cython_debug/
 FoodServer/static/.DS_Store
 FoodServer/static/.DS_Store
 static/assets/logo/Bkash-Logo.png
+.idea/
