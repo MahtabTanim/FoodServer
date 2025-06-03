@@ -37,3 +37,52 @@
 div.dt-container .dt-search input {
     border: none !important;
 }
+
+@media screen and (max-width: 480px) {
+    body {
+        background-color: lightgreen;
+    }
+
+    a.btn.btn-outline-danger.text-uppercase.font-weight-bold {
+        margin-right: 20px !important;
+    }
+
+    .main-header .login-option a.login-popup {
+        margin-right: 20px !important;
+    }
+
+    .main-header .login-option a.get-start-btn {
+        display: block;
+        margin-top: 20px !important;
+    }
+
+    .page-section.cs-nomargin {
+        padding-top: 50px !important;
+        padding-bottom: 0px !important;
+        background-position: left !important;
+    }
+
+    .login-holder {
+        width: 100%;
+    }
+
+    .company-logo ul li.has-border figure img {
+        height: 125px !important;
+        width: 100% !important;
+    }
+
+    .row {
+        width: 100% !important;
+    }
+
+    #opening_hours_table {
+        width: 100% !important;
+    }
+
+    #opening_hours_table td {
+        white-space: nowrap;
+
+    }
+
+
+}
