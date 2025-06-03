@@ -1,6 +1,6 @@
 from decouple import config
 import dj_database_url
-import  os
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -99,8 +99,10 @@ WSGI_APPLICATION = "FoodServer.wsgi.application"
 # }
 
 DATABASES = {
-    # 'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
-    'default': dj_database_url.config(default=config('DATABASE_URL'))
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        engine="django.contrib.gis.db.backends.postgis",
+    )
 }
 
 # Password validation
