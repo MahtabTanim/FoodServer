@@ -178,5 +178,6 @@ cython_debug/
 .DS_Store
 FoodServer/static/.DS_Store
 FoodServer/static/.DS_Store
-static/assets/logo/Bkash-Logo.png
 .idea/
+backup.json
+backup_cleaned.json
