@@ -1,5 +1,6 @@
 from decouple import config
-
+import dj_database_url
+import  os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,6 +22,7 @@ ALLOWED_HOSTS = [
     "66.228.56.9",
     "foodserver.shop",
     "www.foodserver.shop",
+    "https://foodserver-f977c78f68f2.herokuapp.com/",
 ]
 
 
@@ -85,17 +87,20 @@ WSGI_APPLICATION = "FoodServer.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "FoodServer",
-        "USER": config("DB_USER", cast=str),
-        "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
-        "PORT": config("DB_PORT"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.contrib.gis.db.backends.postgis",
+#         "NAME": "FoodServer",
+#         "USER": config("DB_USER", cast=str),
+#         "PASSWORD": config("DB_PASSWORD"),
+#         "HOST": config("DB_HOST"),
+#         "PORT": config("DB_PORT"),
+#     }
+# }
 
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
