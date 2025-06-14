@@ -114,7 +114,7 @@ cd FoodServer
 
 ### 2. **Set up your environment**
 
-- Install [Python 3.12.3](https://www.python.org/downloads/release/python-3123/) (Heroku uses this version, see `runtime.txt`).
+- Install [Python 3.12.3](https://www.python.org/downloads/release/python-3123/) (Heroku uses this version, see `.python-version`).
 - (Recommended) Create and activate a virtual environment:
 
 ```bash
