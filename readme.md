@@ -5,18 +5,63 @@ A comprehensive Django-based food marketplace application that connects customer
 ## 📚 Table of Contents
 
 - [Live Demo](#-live-demo)
+- [Screenshots](#-screenshots)
 - [Application Flowchart](#️-application-flowchart)
 - [Tech Stack](#️-tech-stack)
 - [Key Features](#-key-features)
+- [Prerequisites](#-prerequisites)
 - [Getting Started](#-getting-started)
+- [Amazon S3 Configuration](#️-amazon-s3-configuration)
 - [Technical Architecture](#️-technical-architecture)
 - [Deployment (Heroku)](#-deployment-heroku)
 - [Project Structure](#-project-structure)
 - [Useful Commands](#️-useful-commands)
 - [Configuration & Static Files](#️-configuration--static-files)
 - [Acknowledgements](#-acknowledgements)
+- [Contributing](#-contributing)
+- [Links](#-links)
 
 ## 🌐 **Live Demo:** [foodserver.shop](https://foodserver.shop)
+
+## 📸 Screenshots
+
+### Homepage & Restaurant Discovery
+
+<img src="screenshots/Homepage.png" alt="FoodServer Homepage" width="800"/>
+*Modern homepage with location-based restaurant discovery and Google Maps integration*
+
+### Dynamic Shopping Cart
+
+<img src="screenshots/dynamic cart.png" alt="Dynamic Cart System" width="800"/>
+*Real-time cart updates with AJAX-powered quantity management and instant price calculations*
+
+### Secure Checkout Process
+
+<img src="screenshots/checkout.png" alt="Checkout Process" width="800"/>
+*Streamlined checkout with multiple payment gateway integrations*
+
+### Payment Gateway Integration
+
+<div style="display: flex; gap: 10px;">
+  <img src="screenshots/payment1.png" alt="Payment Gateway 1" width="400"/>
+  <img src="screenshots/payment2.png" alt="Payment Gateway 2" width="400"/>
+</div>
+*Multiple Bangladeshi payment gateways (bKash, Nagad, DBBL) with secure transaction processing*
+
+### User Profile Management
+
+<img src="screenshots/profile.png" alt="User Profile" width="800"/>
+*Comprehensive user profile with order history and account management*
+
+### Restaurant Dashboard
+
+<img src="screenshots/restaurant dashboard.png" alt="Restaurant Dashboard" width="800"/>
+*Vendor dashboard with order management, revenue analytics, and business insights*
+
+### Payment History & Analytics
+
+<img src="screenshots/payment history.png" alt="Payment History" width="800"/>
+*Detailed payment history with transaction tracking and revenue reporting*
 
 ## 🗺️ Application Flowchart
 
@@ -31,6 +76,7 @@ Below is a high-level flowchart illustrating the main components and interaction
 - **Backend:** Django, GeoDjango, PostgreSQL, PostGIS, GDAL
 - **Frontend:** jQuery, AJAX, Google Maps API, DataTables
 - **Authentication:** Django Signals, Token Authentication, Custom User Model
+- **File Storage:** Amazon S3 (Static & Media Files)
 - **DevOps:** Heroku, Gunicorn, WhiteNoise
 - **Payment:** Multiple Bangladeshi Payment Gateways (bKash, Nagad, DBBL)
 
@@ -99,7 +145,7 @@ Below is a high-level flowchart illustrating the main components and interaction
 - Token-based email verification
 - Secure password reset with token validation
 - Role-based access control (Customer/Vendor/Admin)
-- HTTPS-ready static file serving with WhiteNoise
+- HTTPS-ready static file serving with S3 and WhiteNoise
 
 ---
 
@@ -108,13 +154,13 @@ Below is a high-level flowchart illustrating the main components and interaction
 ### 1. **Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/FoodServer.git
+git clone https://github.com/mahtab-tanim/FoodServer.git
 cd FoodServer
 ```
 
 ### 2. **Set up your environment**
 
-- Install [Python 3.12.3](https://www.python.org/downloads/release/python-3123/) (Heroku uses this version, see `runtime.txt`).
+- Install [Python 3.12.3](https://www.python.org/downloads/release/python-3123/) (Heroku uses this version, see `.python-version`).
 - (Recommended) Create and activate a virtual environment:
 
 ```bash
@@ -130,12 +176,45 @@ pip install -r requirements.txt
 
 ### 4. **Configure environment variables**
 
-- Copy `.env-sample` to `.env` and fill in your secrets and configuration:
+Create and configure your environment file:
 
 ```bash
 cp .env-sample .env
-# Edit .env with your editor and fill in the values
 ```
+
+**Required Environment Variables:**
+
+```env
+# Django Core Settings
+SECRET_KEY=your-super-secret-django-key-here
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1,yourapp.herokuapp.com,foodserver.shop
+
+# Database Configuration
+DATABASE_URL=postgresql://username:password@localhost:5432/foodserver_db
+
+# Google Maps API
+GOOGLE_API_KEY=your-google-maps-api-key
+
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-app-password
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=FoodServer <noreply@foodserver.shop>
+
+# AWS S3 Configuration (for Static & Media Files)
+USE_S3=True
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
+AWS_STORAGE_BUCKET_NAME=your-s3-bucket-name
+AWS_S3_REGION_NAME=us-east-1
+AWS_S3_CUSTOM_DOMAIN=your-bucket.s3.amazonaws.com
+
+```
+
+⚠️ **Important:** Never commit your `.env` file to version control!
 
 ### 5. **Apply migrations**
 
@@ -163,6 +242,38 @@ gunicorn FoodServer.wsgi
 
 ---
 
+## ☁️ Amazon S3 Configuration
+
+### **Static & Media Files Storage**
+
+This application uses Amazon S3 for serving static files (CSS, JS, images) and media files (user uploads) in production.
+
+### **S3 Setup Steps**
+
+1. **Create S3 Bucket** with public read access
+2. **Configure CORS for Font Files:**
+   ```json
+   [
+     {
+       "AllowedHeaders": ["*"],
+       "AllowedMethods": ["GET", "HEAD"],
+       "AllowedOrigins": ["*"],
+       "ExposeHeaders": []
+     }
+   ]
+   ```
+3. **Create IAM User** with S3 access permissions
+4. **Add environment variables** (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, etc.)
+
+### **Features**
+
+- ✅ Static & media files served from S3
+- ✅ CORS configured for font loading
+- ✅ Environment toggle (USE_S3=False for local development)
+- ✅ Optimized caching headers
+
+---
+
 ## 🏗️ Technical Architecture
 
 ### **Database & Geospatial**
@@ -187,7 +298,7 @@ gunicorn FoodServer.wsgi
 
 ### **Production Infrastructure**
 
-- **WhiteNoise** for efficient static file serving in production
+- **Amazon S3** for static and media file storage
 - **Gunicorn** as WSGI HTTP server for production deployment
 - **Heroku** cloud platform with specialized GeoDjango buildpacks
 
@@ -287,17 +398,30 @@ FoodServer/
 
 ## ⚙️ Configuration & Static Files
 
+### **Amazon S3 Integration**
+
+- **Production Storage** - All static and media files served from Amazon S3
+- **CORS Configuration** - Fixed font loading issues with proper CORS headers
+- **Environment Toggle** - Easy switching between S3 and local storage (`USE_S3=True/False`)
+
 ### **Static File Handling**
 
-- **WhiteNoise** used in production to serve static files efficiently without requiring a separate web server
-- Configured with `STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"`
-- Provides automatic compression and caching for optimal performance
-- Eliminates the need for CDN setup in small to medium-scale deployments
+**Production (S3):**
+
+- Static files automatically uploaded to S3 during deployment
+- Media files uploaded directly to S3 from application
+- Optimized cache control headers for performance
+
+**Development (Local):**
+
+- Static files served from local filesystem
+- WhiteNoise used for static file serving
 
 ### **Procfile Configuration**
 
 ```
 web: gunicorn FoodServer.wsgi
+release: python manage.py collectstatic --noinput
 ```
 
 ### **Runtime Specification**
@@ -313,18 +437,9 @@ web: gunicorn FoodServer.wsgi
 
 ---
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ---
 
 ## 🔗 Links
 
 - **Live Application:** [foodserver.shop](https://foodserver.shop)
-- **Repository:** [GitHub](https://github.com/yourusername/FoodServer)
-- **Issues:** [GitHub Issues](https://github.com/yourusername/FoodServer/issues)
+- **Repository:** [GitHub](https://github.com/MahtabTanim/FoodServer)
