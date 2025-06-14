@@ -328,3 +328,5 @@ web: gunicorn FoodServer.wsgi
 - **Live Application:** [foodserver.shop](https://foodserver.shop)
 - **Repository:** [GitHub](https://github.com/yourusername/FoodServer)
 - **Issues:** [GitHub Issues](https://github.com/yourusername/FoodServer/issues)
+
+https://foodserver-media-files.s3.eu-north-1.amazonaws.com/users/profile_profiles/01-Set_Variables.jpg https://foodserver-media-files.s3.eu-north-1.amazonaws.com/04-Set_Value.png
